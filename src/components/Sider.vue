@@ -7,11 +7,20 @@
             <div class="recent">
                 <n-icon name="new" class="icon"></n-icon><span>最新文档</span>
             </div>
-            <div class="my-document  active">
+            <div class="my-documents">
                 <n-icon name="wenjianjia" class="icon"></n-icon><span>我的文件夹</span>
             </div>
-            <div class="trash">
+            <div class="document active">
+                <n-icon name="wenjian" class="icon"></n-icon><span>我的资源</span>
+                <p></p>
+            </div>
+            <div class="document">
+                <n-icon name="wenjian" class="icon"></n-icon><span>我的资源</span>
+                <p></p>
+            </div>
+            <div class="trash active">
                 <n-icon name="trash" class="icon"></n-icon><span>回收站</span>
+                <p></p>
             </div>
         </div>
         <div class="detail">
@@ -68,6 +77,19 @@
                 >span {
                     cursor: pointer;
                     margin-left: 15px;
+                    position: relative;
+                    &::after {
+                        content: '';
+                        display: inline-block;
+                        width: 4px;
+                        height: 4px;
+                        border: 4px solid transparent;
+                        border-top-color: #999;
+                        position: absolute;
+                        top: 0;
+                        right: 0;
+                        transform: translateY(7px) translateX(15px);
+                    }
                     &:hover {
                         color: $tcolor;
                     }
@@ -94,7 +116,7 @@
                     color: #fff;
                 }
             }
-            >.my-document {
+            >.my-documents {
                 height: 40px;
                 cursor: pointer;
                 display: flex;
@@ -112,6 +134,42 @@
                     color: #fff;
                 }
             }
+            >.document {
+                height: 40px;
+                cursor: pointer;
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                padding-left: 60px;
+                position: relative;
+                >span {
+                    margin-left: 15px;
+                }
+                >p {
+                    width: 5px;
+                    height: 5px;
+                    border: 5px solid transparent;
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    transform: translateY(18px) translateX(-25px);
+                }
+                &:hover {
+                    background: $hcolor;
+                    >p {
+                        border-top-color: #666;
+                    }
+                }
+                &.active {
+                    background: $tcolor;
+                    color: #fff;
+                    &:hover {
+                        >p {
+                            border-top-color: #fff;
+                        }
+                    }
+                }
+            }
             >.trash {
                 height: 40px;
                 cursor: pointer;
@@ -119,15 +177,33 @@
                 justify-content: flex-start;
                 align-items: center;
                 padding-left: 40px;
+                position: relative;
                 >span {
                     margin-left: 15px;
                 }
+                >p {
+                    width: 5px;
+                    height: 5px;
+                    border: 5px solid transparent;
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    transform: translateY(18px) translateX(-25px);
+                }
                 &:hover {
                     background: $hcolor;
+                    >p {
+                        border-top-color: #666;
+                    }
                 }
                 &.active {
                     background: $tcolor;
                     color: #fff;
+                    &:hover {
+                        >p {
+                            border-top-color: #fff;
+                        }
+                    }
                 }
             }
         }
