@@ -14,17 +14,23 @@
 </template>
 <script>
     import Icon from './icon.vue'
+    import { mapState } from 'vuex'
     export default {
         name: 'Header',
         components: { 'n-icon': Icon },
         data() {
             return {
-                isLogin: false
+
             }
+        },
+        computed: {
+            ...mapState({
+                isLogin: state => state.auth.isLogin
+            })
         },
         methods: {
             onClick() {
-                this.isLogin = !this.isLogin;
+                
             }
         }
     }
