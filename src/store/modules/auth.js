@@ -9,21 +9,41 @@ const state = {
 const getters = {}
 
 const mutations = {
-    setUser(state, playload) {
-        state.user = playload;
+    setUser(state, payload) {
+        state.user = payload;
     },
-    setLogin(state, playload) {
-        state.isLogin = playload.isLogin;
+    setLogin(state, payload) {
+        state.isLogin = payload.isLogin;
     }
 }
 
 const actions = {
     async login({ commit }, { username, password }) {
-        let res = await request({ url: url.login, method: 'POST', data: { username, password } })
+        let res = await request({
+            url: url.login,
+            method: 'POST',
+            data: { username, password }
+        });
         commit('setUser', res.data);
-        commit('setLogin', { isLogin: true })
+        commit('setLogin', { isLogin: true });
         return res;
-    }
+    },
+    async logout({ commit }) {
+        let res = await request({ url: url.logout });
+        commit('setUser', null);
+        commit('setLogin', { isLogin: false });
+        return res;
+    },
+    async register({ commit }, { username, password }) {
+        let res = await request({
+            url: url.register,
+            method: 'POST',
+            data: { username, password }
+        });
+        commit('setUser', res.data);
+        commit('setLogin', { isLogin: true });
+        return res;
+    },
 }
 
 export default { state, getters, mutations, actions }

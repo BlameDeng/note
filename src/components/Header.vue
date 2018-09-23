@@ -1,5 +1,5 @@
 <template>
-    <div class="header" :class="{login:isLogin}" @click="onClick">
+    <div class="header" :class="{login:isLogin}" @click="a=!a">
         <div class="logo">
             <span class="pen">
                 <n-icon name="pen"></n-icon>
@@ -14,13 +14,13 @@
 </template>
 <script>
     import Icon from './icon.vue'
-    import { mapState } from 'vuex'
+    import { mapState, mapActions } from 'vuex'
     export default {
         name: 'Header',
         components: { 'n-icon': Icon },
         data() {
             return {
-
+               a:false
             }
         },
         computed: {
@@ -29,8 +29,9 @@
             })
         },
         methods: {
+            ...mapActions(['logout']),
             onClick() {
-                
+                this.logout();
             }
         }
     }
@@ -39,9 +40,8 @@
     @import '@/assets/base.scss';
     .header {
         background: $tcolor;
-        height: 60px;
         color: #fff;
-        padding: 14px 0;
+        padding: 54px 0;
         min-width: 960px;
         >.logo {
             width: 960px;
@@ -49,9 +49,9 @@
             padding: 0 20px;
             >.pen {
                 border: 1px solid #fff;
-                width: 24px;
-                height: 24px;
-                font-size: 22px;
+                width: 44px;
+                height: 44px;
+                font-size: 42px;
                 display: inline-flex;
                 justify-content: center;
                 align-items: center;
@@ -61,7 +61,7 @@
                 margin-right: 4px;
             }
             >.text {
-                font-size: 23px;
+                font-size: 43px;
                 vertical-align: middle;
             }
         }
@@ -69,10 +69,19 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 14px 0;
             >.logo {
                 width: auto;
                 margin: 0 0;
                 padding: 0 20px;
+                >.pen {
+                    width: 24px;
+                    height: 24px;
+                    font-size: 22px;
+                }
+                >.text {
+                    font-size: 23px;
+                }
             }
             >.user-info {
                 display: flex;

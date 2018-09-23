@@ -12,7 +12,13 @@ export default function request({ url, method = "GET", data = {} }) {
             option.params = data;
         } else { option.data = data; }
         axios(option).then(res => {
-            if (res.status === 200) { resolve(res.data); } else { reject(res.data); }
-        }).catch(err => { reject(err); })
+            if (res.status === 200) {
+                resolve(res.data);
+            } else {
+                reject(res);
+            }
+        }).catch(err => {
+            reject(err);
+        })
     })
 }
