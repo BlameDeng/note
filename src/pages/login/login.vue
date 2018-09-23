@@ -44,7 +44,7 @@
                     return
                 }
                 this.login({ username: this.username, password: this.password }).then(res => {
-                    console.log(res);
+                    this.$router.push('/file');
                 }).catch((err) => {
                     this.$message.error('用户名不存在或密码不正确');
                 })

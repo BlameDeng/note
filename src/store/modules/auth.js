@@ -3,7 +3,7 @@ import request from '@/helpers/request.js'
 
 const state = {
     user: null,
-    isLogin: false,
+    isLogin: true,
 }
 
 const getters = {}
