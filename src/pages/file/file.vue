@@ -9,7 +9,7 @@
 </template>
 <script>
     import Header from "@/components/Header.vue"
-    import Sider from "@/components/Sider.vue"
+    import Sider from "@/components/sider/Sider.vue"
     import Article from '@/components/Article.vue'
     import { mapActions, mapState } from "vuex"
     export default {
