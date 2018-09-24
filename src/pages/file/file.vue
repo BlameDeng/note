@@ -29,15 +29,13 @@
         },
         created() {
             this.getNotebooks().then(res => {
-                console.log(res);
-                console.log(this.allNotebooks)
             }).catch(() => {});
         },
         methods: {
             ...mapActions(['getNotebooks', 'createNotebooks', 'logout']),
             onClick() {
                 this.createNotebooks({ title: '我的笔记本' }).then(res => {
-                    console.log(res);
+   
                 }).catch(() => {});
             },
             onClick1() {

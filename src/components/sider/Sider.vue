@@ -9,15 +9,16 @@
                     <p ref="notebook" @click="onAddNotebook">新建文件夹</p>
                 </div>
             </div>
-            <div class="recent" :class="{active:selectedTab==='recent'}" @click="onClickTab('recent')">
+            <div class="recent" :class="{active:selectedTab==='recent'}" @click="onClickTab($event,'recent')">
                 <n-icon name="new" class="icon"></n-icon>
                 <span>最新文档</span>
             </div>
-            <div class="my-documents" :class="{active:selectedTab==='myDocuments'}" @click="onClickTab('myDocuments')">
+            <div class="my-documents" :class="{active:selectedTab==='myDocuments'}" @click="onClickTab($event,'myDocuments')">
+                <p @click="toggleCollect" :class="{active:!collectNotebooks}" ref="wenjianjiaP"></p>
                 <n-icon name="wenjianjia" class="icon"></n-icon>
                 <span>我的文件夹</span>
             </div>
-            <div class="document" v-for="(notebook,index) in allNotebooks" :key="notebook.id" v-if="allNotebooks&&allNotebooks.length" @click.right="onRightNotebook($event,index,notebook)" :class="{active:index===clickNotebookIndex}" @click="onLeftNotebook(index)">
+            <div class="document" v-for="(notebook,index) in allNotebooks" :key="notebook.id" v-if="allNotebooks&&allNotebooks.length&&!collectNotebooks" @click.right="onRightNotebook($event,index,notebook)" :class="{active:index===clickNotebookIndex}" @click="onLeftNotebook(index)">
                 <template v-if="notebook.id!==renameNotebookId">
                     <n-icon name="wenjian" class="icon"></n-icon>
                     <span>{{notebook.title}}</span>
@@ -32,12 +33,11 @@
                     <input type="text" v-model="notebooksNewName" autofocus="autofocus" @focus="onFocus" @blur="onSubmitRenameNotebook(notebook)">
                 </template>
             </div>
-
             <div class="document" v-if="showNewNotebook">
                 <n-icon name="wenjian" class="icon"></n-icon>
                 <input type="text" v-model="newNotebookName" autofocus="autofocus" @focus="onFocus" @blur="onSubmitAddNotebook">
             </div>
-            <div class="trash" :class="{active:selectedTab==='trash'}" @click="onClickTab('trash')">
+            <div class="trash" :class="{active:selectedTab==='trash'}" @click="onClickTab($event,'trash')">
                 <n-icon name="trash" class="icon"></n-icon>
                 <span>回收站</span>
                 <p></p>
@@ -77,7 +77,8 @@
                 clickNotebookIndex: -1,
                 rightNotebookIndex: -1,
                 notebooksNewName: '',
-                renameNotebookId: ''
+                renameNotebookId: '',
+                collectNotebooks: true
             }
         },
         computed: {
@@ -93,14 +94,16 @@
             ...mapMutations(['addNotebooks', 'filterNotebooks', 'updateNotebooks']),
             onClick() { this.logout(); },
             onClickAdd() { this.showPop = true; },
-            onClickTab(tab) {
+            onClickTab(e, tab) {
                 this.selectedTab = tab;
-                if (tab !== 'myDocuments') {
-                    this.selectedNotebookId = '';
-                    this.clickNotebookIndex = -1;
-                    this.rightNotebookIndex = -1;
+                this.selectedNotebookId = '';
+                this.clickNotebookIndex = -1;
+                this.rightNotebookIndex = -1;
+                if (tab === 'myDocuments' && e.target !== this.$refs.wenjianjiaP) {
+                    this.collectNotebooks = false;
                 }
             },
+            toggleCollect() { this.collectNotebooks = !this.collectNotebooks; },
             listenToDocument(e) {
                 let note = this.$refs.note;
                 let notebook = this.$refs.notebook;
@@ -127,8 +130,9 @@
             },
             onRightNotebook(e, index, notebook) {
                 let { offsetX: x, offsetY: y } = e;
-                if (e.target===this.$refs.wenjiaP[index]) {
-                    x=220;y=40;
+                if (e.target === this.$refs.wenjiaP[index]) {
+                    x = 220;
+                    y = 40;
                 }
                 this.notebookPop(x, y, index);
                 this.selectedNotebookId = notebook.id;
