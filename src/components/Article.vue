@@ -15,7 +15,13 @@
         name: 'Article',
         data() {
             return { title: '无标题笔记' }
-        }
+        },
+        inject: ['eventBus'],
+        created() {
+this.eventBus.$on('add-note',()=>{
+    console.log('shoudaole')
+})
+        },
     }
 </script>
 <style lang="scss" scoped>

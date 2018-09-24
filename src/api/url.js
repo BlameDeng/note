@@ -8,7 +8,7 @@ const url = {
     renameNotebooks: '/notebooks/:notebookId',
     deleteNotebooks: '/notebooks/:notebookId',
     createNote: '/notes/to/:notebookId',
-    getNote: '/notes/from/:notebookId',
+    getNotes: '/notes/from/:notebookId',
     deleteNote: '/notes/:noteId',
     modifyNote: '/notes/:noteId',
     deleteNoteConfirm: '/notes/:noteId/confirm',

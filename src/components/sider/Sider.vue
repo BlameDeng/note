@@ -5,7 +5,7 @@
                 <n-icon name="add" class="icon" @click="onClickAdd" style="cursor:pointer;"></n-icon>
                 <span @click="onClickAdd">新建文档</span>
                 <div class="popover" v-show="showPop">
-                    <p ref="note">新建笔记</p>
+                    <p ref="note" @click="onAddNote">新建笔记</p>
                     <p ref="notebook" @click="onAddNotebook">新建文件夹</p>
                 </div>
             </div>
@@ -81,6 +81,7 @@
                 collectNotebooks: true
             }
         },
+        inject:['eventBus'],
         computed: {
             ...mapState({
                 isLogin: state => state.auth.isLogin,
@@ -92,7 +93,7 @@
                 'deleteNotebooks', 'renameNotebooks'
             ]),
             ...mapMutations(['addNotebooks', 'filterNotebooks', 'updateNotebooks']),
-            onClick() { this.logout(); },
+            onAddNote() { this.eventBus.$emit('add-note'); },
             onClickAdd() { this.showPop = true; },
             onClickTab(e, tab) {
                 this.selectedTab = tab;

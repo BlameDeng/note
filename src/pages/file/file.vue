@@ -12,6 +12,7 @@
     import Sider from "@/components/sider/Sider.vue"
     import Article from '@/components/Article.vue'
     import { mapActions, mapState } from "vuex"
+    import Vue from 'vue'
     export default {
         name: "File",
         components: {
@@ -20,7 +21,10 @@
             'n-article': Article
         },
         data() {
-            return {};
+            return { eventBus: new Vue() };
+        },
+        provide() {
+            return { eventBus: this.eventBus };
         },
         computed: {
             ...mapState({
@@ -28,14 +32,13 @@
             })
         },
         created() {
-            this.getNotebooks().then(res => {
-            }).catch(() => {});
+            this.getNotebooks().then(res => {}).catch(() => {});
         },
         methods: {
             ...mapActions(['getNotebooks', 'createNotebooks', 'logout']),
             onClick() {
                 this.createNotebooks({ title: '我的笔记本' }).then(res => {
-   
+
                 }).catch(() => {});
             },
             onClick1() {
