@@ -10,7 +10,7 @@ const getters = {}
 
 const mutations = {
     setUser(state, payload) {
-        state.user = payload;
+        state.user = payload.user;
     },
     setLogin(state, payload) {
         state.isLogin = payload.isLogin;
@@ -24,7 +24,7 @@ const actions = {
             method: 'POST',
             data: { username, password }
         });
-        commit('setUser', res.data);
+        commit('setUser', {user:res.data});
         commit('setLogin', { isLogin: true });
         return res;
     },
@@ -40,7 +40,7 @@ const actions = {
             method: 'POST',
             data: { username, password }
         });
-        commit('setUser', res.data);
+        commit('setUser', { user: res.data });
         commit('setLogin', { isLogin: true });
         return res;
     },

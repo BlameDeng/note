@@ -10,12 +10,8 @@
             <div class="my-documents">
                 <n-icon name="wenjianjia" class="icon"></n-icon><span>我的文件夹</span>
             </div>
-            <div class="document active">
-                <n-icon name="wenjian" class="icon"></n-icon><span>我的资源</span>
-                <p></p>
-            </div>
-            <div class="document">
-                <n-icon name="wenjian" class="icon"></n-icon><span>我的资源</span>
+            <div class="document" v-for="notebook in allNotebooks" :key="notebook.id" v-if="allNotebooks&&allNotebooks.length">
+                <n-icon name="wenjian" class="icon"></n-icon><span>{{notebook.title}}</span>
                 <p></p>
             </div>
             <div class="trash active">
@@ -24,7 +20,20 @@
             </div>
         </div>
         <div class="detail">
-            <div class="search"></div>
+            <div class="search">
+                <n-icon name="search" class="icon"></n-icon>
+                <input type="text" placeholder="搜索...">
+            </div>
+            <div class="widget">
+                <div class="document" v-for="notebook in allNotebooks" :key="notebook.id" v-if="allNotebooks&&allNotebooks.length">
+                    <div class="icon-wrapper">
+                        <n-icon name="wenjian" class="icon"></n-icon>
+                        <span>{{notebook.title}}</span>
+                        <n-icon name="trash" class="icon"></n-icon>
+                    </div>
+                    <p>{{notebook.createdAt}}</p>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -35,13 +44,12 @@
         name: 'Seader',
         components: { 'n-icon': Icon },
         data() {
-            return {
-
-            }
+            return {}
         },
         computed: {
             ...mapState({
-                isLogin: state => state.auth.isLogin
+                isLogin: state => state.auth.isLogin,
+                allNotebooks: state => state.notebooks.allNotebooks
             })
         },
         methods: {
@@ -57,6 +65,9 @@
     .sider {
         display: flex;
         width: 500px;
+        font-size: 12px;
+        flex-grow: 0;
+        flex-shrink: 0;
         >.nav {
             width: 250px;
             flex-grow: 0;
@@ -71,6 +82,7 @@
                 justify-content: flex-start;
                 align-items: center;
                 padding-left: 40px;
+                border-bottom: 1px solid $bcolor1;
                 >.icon {
                     fill: $tcolor;
                 }
@@ -94,7 +106,6 @@
                         color: $tcolor;
                     }
                 }
-
             }
             >.recent {
                 height: 40px;
@@ -108,7 +119,7 @@
                     margin-left: 15px;
                 }
                 &:hover {
-                    background: $hcolor;
+                    background: $hcolor1;
                     border-top: none;
                 }
                 &.active {
@@ -127,7 +138,7 @@
                     margin-left: 15px;
                 }
                 &:hover {
-                    background: $hcolor;
+                    background: $hcolor1;
                 }
                 &.active {
                     background: $tcolor;
@@ -155,7 +166,7 @@
                     transform: translateY(18px) translateX(-25px);
                 }
                 &:hover {
-                    background: $hcolor;
+                    background: $hcolor1;
                     >p {
                         border-top-color: #666;
                     }
@@ -191,7 +202,7 @@
                     transform: translateY(18px) translateX(-25px);
                 }
                 &:hover {
-                    background: $hcolor;
+                    background: $hcolor1;
                     >p {
                         border-top-color: #666;
                     }
@@ -212,10 +223,96 @@
             flex-grow: 0;
             flex-shrink: 0;
             height: 800px;
-            background: #888;
+            border-right: 1px solid $bcolor1;
             >.search {
                 height: 60px;
-                border: 1px solid #333;
+                text-align: center;
+                vertical-align: middle;
+                position: relative;
+                border-bottom: 1px solid $bcolor1;
+                >.icon {
+                    font-size: 16px;
+                    fill: $tcolor2;
+                    position: absolute;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    margin-left: 9px;
+                    cursor: pointer;
+                    &:hover {
+                        fill: $tcolor;
+                    }
+                }
+                >input {
+                    width: 160px;
+                    height: 36px;
+                    margin-top: 12px;
+                    border: 1px solid $bcolor1;
+                    border-radius: 18px;
+                    padding: 0 28px;
+                    &:focus {
+                        outline: none;
+                    }
+                }
+            }
+            >.widget {
+                >.document {
+                    cursor: pointer;
+                    padding: 5px 0 5px 20px;
+                    border-bottom: 1px solid $bcolor1;
+                    >.icon-wrapper {
+                        display: flex;
+                        justify-content: flex-start;
+                        align-items: center;
+                        padding: 10px 0;
+                        >span {
+                            margin-left: 10px;
+                        }
+                        >.icon {
+                            &:last-child {
+                                margin-left: auto;
+                                margin-right: 20px;
+                                font-size: 16px;
+                                display: none;
+                                fill: $tcolor2;
+                                &:hover {
+                                    fill: $tcolor;
+                                }
+                            }
+                        }
+                    }
+                    >p {
+                        padding-bottom: 10px;
+                        color: $tcolor4;
+                    }
+                    &:hover {
+                        background: $hcolor2;
+                        >.icon-wrapper {
+                            >.icon {
+                                &:last-child {
+                                    display: inline;
+                                }
+                            }
+                        }
+                        >p {
+                            border-top-color: #666;
+                        }
+                    }
+                    &.active {
+                        background: $acolor;
+                        >.icon-wrapper {
+                            >.icon {
+                                &:last-child {
+                                    display: inline;
+                                }
+                            }
+                        }
+                        &:hover {
+                            >p {
+                                border-top-color: #fff;
+                            }
+                        }
+                    }
+                }
             }
         }
     }

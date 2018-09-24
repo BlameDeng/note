@@ -1,15 +1,22 @@
 import url from '@/api/url.js'
 import request from '@/helpers/request.js'
 
-const state = {}
+const state = {
+    allNotebooks: null
+}
 
 const getters = {}
 
-const mutations = {}
+const mutations = {
+    setAllNotebooks(state, payload) {
+        state.allNotebooks = payload.allNotebooks;
+    }
+}
 
 const actions = {
     async getNotebooks({ commit }) {
         let res = await request({ url: url.getNotebooks });
+        commit('setAllNotebooks', { allNotebooks: res.data });
         return res;
     },
     async createNotebooks({ commit }, { title }) {

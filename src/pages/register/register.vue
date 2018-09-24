@@ -49,7 +49,7 @@
                     return
                 }
                 this.register({ username: this.username, password: this.password }).then(res => {
-                    console.log(res);
+                    this.$router.push('/file');
                 }).catch((err) => {
                     
                 })
