@@ -16,6 +16,13 @@ const mutations = {
     },
     filterNotebooks(state, payload) {
         state.allNotebooks = state.allNotebooks.filter((notebook) => notebook.id !== payload.id);
+    },
+    updateNotebooks(state, payload) {
+        state.allNotebooks.map(notebook => {
+            if (notebook.id === payload.notebook.id) {
+                notebook = payload.notebook
+            }
+        })
     }
 }
 
@@ -31,6 +38,14 @@ const actions = {
     },
     async deleteNotebooks({ commit }, { notebookId }) {
         let res = await request({ url: url.deleteNotebooks.replace(':notebookId', notebookId), method: 'DELETE' });
+        return res;
+    },
+    async renameNotebooks({ commit }, { title, notebookId }) {
+        let res = await request({
+            url: url.renameNotebooks.replace(':notebookId', notebookId),
+            method: 'PATCH',
+            data: { title }
+        });
         return res;
     }
 }

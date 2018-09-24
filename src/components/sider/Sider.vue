@@ -17,21 +17,26 @@
                 <n-icon name="wenjianjia" class="icon"></n-icon>
                 <span>我的文件夹</span>
             </div>
-            <div class="document" v-for="(notebook,index) in allNotebooks" :key="notebook.id" v-if="allNotebooks&&allNotebooks.length" @click.right.self="onRightNotebook($event,index,notebook)" :class="{active:index===clickNotebookIndex}" @click="onLeftNotebook(index)">
-                <n-icon name="wenjian" class="icon"></n-icon>
-                <span>{{notebook.title}}</span>
-                <p @click="onClcikP(index,notebook)" @click.right="onClcikP(index,notebook)"></p>
-                <div class="popover" ref="documentPopover" :class="{active:notebook.id===selectedNotebookId}">
-                    <p ref="rename">重命名</p>
-                    <p ref="cancle">删除</p>
-                </div>
-            </div>
-            <template>
-                <div class="document" v-if="showNewNotebook">
+            <div class="document" v-for="(notebook,index) in allNotebooks" :key="notebook.id" v-if="allNotebooks&&allNotebooks.length" @click.right="onRightNotebook($event,index,notebook)" :class="{active:index===clickNotebookIndex}" @click="onLeftNotebook(index)">
+                <template v-if="notebook.id!==renameNotebookId">
                     <n-icon name="wenjian" class="icon"></n-icon>
-                    <input type="text" v-model="newNotebookName" autofocus="autofocus" @focus="onFocus" @blur="onSubmitAddNotebook">
-                </div>
-            </template>
+                    <span>{{notebook.title}}</span>
+                    <p @click="onRightNotebook($event,index,notebook)" ref="wenjiaP"></p>
+                    <div class="popover" ref="documentPopover" :class="{active:notebook.id===selectedNotebookId}">
+                        <p ref="rename" @click="onRenameNotebook(notebook)">重命名</p>
+                        <p ref="cancle" @click="onDeleteNotebooks(notebook)">删除</p>
+                    </div>
+                </template>
+                <template v-else>
+                    <n-icon name="wenjian" class="icon"></n-icon>
+                    <input type="text" v-model="notebooksNewName" autofocus="autofocus" @focus="onFocus" @blur="onSubmitRenameNotebook(notebook)">
+                </template>
+            </div>
+
+            <div class="document" v-if="showNewNotebook">
+                <n-icon name="wenjian" class="icon"></n-icon>
+                <input type="text" v-model="newNotebookName" autofocus="autofocus" @focus="onFocus" @blur="onSubmitAddNotebook">
+            </div>
             <div class="trash" :class="{active:selectedTab==='trash'}" @click="onClickTab('trash')">
                 <n-icon name="trash" class="icon"></n-icon>
                 <span>回收站</span>
@@ -70,7 +75,9 @@
                 selectedTab: '',
                 selectedNotebookId: '',
                 clickNotebookIndex: -1,
-                rightNotebookIndex: -1
+                rightNotebookIndex: -1,
+                notebooksNewName: '',
+                renameNotebookId: ''
             }
         },
         computed: {
@@ -81,9 +88,9 @@
         },
         methods: {
             ...mapActions(['logout', 'getNotebooks', 'createNotebooks',
-                'deleteNotebooks'
+                'deleteNotebooks', 'renameNotebooks'
             ]),
-            ...mapMutations(['addNotebooks', 'filterNotebooks']),
+            ...mapMutations(['addNotebooks', 'filterNotebooks', 'updateNotebooks']),
             onClick() { this.logout(); },
             onClickAdd() { this.showPop = true; },
             onClickTab(tab) {
@@ -120,13 +127,10 @@
             },
             onRightNotebook(e, index, notebook) {
                 let { offsetX: x, offsetY: y } = e;
+                if (e.target===this.$refs.wenjiaP[index]) {
+                    x=220;y=40;
+                }
                 this.notebookPop(x, y, index);
-                this.selectedNotebookId = notebook.id;
-                this.clickNotebookIndex = index;
-                this.rightNotebookIndex = index;
-            },
-            onClcikP(index, notebook) {
-                this.notebookPop(220, 40, index);
                 this.selectedNotebookId = notebook.id;
                 this.clickNotebookIndex = index;
                 this.rightNotebookIndex = index;
@@ -138,6 +142,19 @@
             },
             onLeftNotebook(index) {
                 this.clickNotebookIndex = index;
+            },
+            onRenameNotebook(notebook) {
+                this.notebooksNewName = notebook.title;
+                this.renameNotebookId = notebook.id;
+            },
+            onSubmitRenameNotebook(notebook) {
+                this.renameNotebooks({ title: this.notebooksNewName, notebookId: this.renameNotebookId })
+                    .then(res => {
+                        notebook.title = this.notebooksNewName;
+                        this.updateNotebooks({ notebook });
+                        this.notebooksNewName = '';
+                        this.renameNotebookId = '';
+                    })
             }
         },
         watch: {

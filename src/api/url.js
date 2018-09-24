@@ -5,7 +5,7 @@ const url = {
     login: '/auth/login',
     getNotebooks: '/notebooks',
     createNotebooks: '/notebooks',
-    modifyNotebooks: '/notebooks/:notebookId',
+    renameNotebooks: '/notebooks/:notebookId',
     deleteNotebooks: '/notebooks/:notebookId',
     createNote: '/notes/to/:notebookId',
     getNote: '/notes/from/:notebookId',
