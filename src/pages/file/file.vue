@@ -2,6 +2,8 @@
     <div class="file">
         <n-header></n-header>
         <n-sider></n-sider>
+        <button @click="onClick">123456</button>
+        <button @click="onClick1">注销</button>
     </div>
 </template>
 <script>
@@ -14,9 +16,21 @@
         data() {
             return {};
         },
-        created() {},
+        created() {
+            this.getNotebooks().then(res => {
+                console.log(res);
+            })
+        },
         methods: {
-            ...mapActions(['login', 'logout']),
+            ...mapActions(['getNotebooks', 'createNotebooks', 'logout']),
+            onClick() {
+                this.createNotebooks({ title: '我的笔记本' }).then(res => {
+                    console.log(res);
+                })
+            },
+            onClick1() {
+                this.logout();
+            }
         }
     };
 </script>

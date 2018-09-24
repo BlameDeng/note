@@ -51,7 +51,7 @@
                 this.register({ username: this.username, password: this.password }).then(res => {
                     console.log(res);
                 }).catch((err) => {
-                    this.$message.error('用户名已存在');
+                    
                 })
             },
             onToLogin() {
