@@ -19,10 +19,9 @@
     </div>
 </template>
 <script>
-    import Header from "@/components/Header.vue";
-    import url from "@/api/url.js";
-    import request from "@/helpers/request.js";
-    import { mapActions } from "vuex";
+    import Header from "@/components/Header.vue"
+    import url from "@/api/url.js"
+    import { mapActions } from "vuex"
     export default {
         name: "Login",
         components: { "n-header": Header },

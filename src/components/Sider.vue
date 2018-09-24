@@ -2,7 +2,12 @@
     <div class="sider">
         <div class="nav">
             <div class="add">
-                <n-icon name="add" class="icon"></n-icon><span>新建文档</span>
+                <n-icon name="add" class="icon" @click="onClickAdd" style="cursor:pointer;"></n-icon>
+                <span @click="onClickAdd">新建文档</span>
+                <div class="popover" v-show="showPop">
+                    <p ref="note">新建笔记</p>
+                    <p ref="notebook" @click="onAddNotebook">新建文件夹</p>
+                </div>
             </div>
             <div class="recent">
                 <n-icon name="new" class="icon"></n-icon><span>最新文档</span>
@@ -11,9 +16,16 @@
                 <n-icon name="wenjianjia" class="icon"></n-icon><span>我的文件夹</span>
             </div>
             <div class="document" v-for="notebook in allNotebooks" :key="notebook.id" v-if="allNotebooks&&allNotebooks.length">
-                <n-icon name="wenjian" class="icon"></n-icon><span>{{notebook.title}}</span>
+                <n-icon name="wenjian" class="icon"></n-icon>
+                <span>{{notebook.title}}</span>
                 <p></p>
             </div>
+            <template>
+                <div class="document" v-if="showNewNotebook">
+                    <n-icon name="wenjian" class="icon"></n-icon>
+                    <input type="text" v-model="newNotebookName" autofocus="autofocus" @focus="onFocus" @blur="onSubmitAddNotebook">
+                </div>
+            </template>
             <div class="trash active">
                 <n-icon name="trash" class="icon"></n-icon><span>回收站</span>
                 <p></p>
@@ -29,7 +41,7 @@
                     <div class="icon-wrapper">
                         <n-icon name="wenjian" class="icon"></n-icon>
                         <span>{{notebook.title}}</span>
-                        <n-icon name="trash" class="icon"></n-icon>
+                        <n-icon name="trash" class="icon" @click="onDeleteNotebooks(notebook)"></n-icon>
                     </div>
                     <p>{{notebook.createdAt}}</p>
                 </div>
@@ -39,12 +51,16 @@
 </template>
 <script>
     import Icon from './icon.vue'
-    import { mapState, mapActions } from 'vuex'
+    import { mapState, mapActions, mapMutations } from 'vuex'
     export default {
-        name: 'Seader',
+        name: 'Sider',
         components: { 'n-icon': Icon },
         data() {
-            return {}
+            return {
+                showPop: false,
+                showNewNotebook: false,
+                newNotebookName: '新文件夹'
+            }
         },
         computed: {
             ...mapState({
@@ -53,10 +69,56 @@
             })
         },
         methods: {
-            ...mapActions(['logout']),
+            ...mapActions(['logout', 'getNotebooks', 'createNotebooks',
+                'deleteNotebooks'
+            ]),
+            ...mapMutations(['addNotebooks', 'filterNotebooks']),
             onClick() {
                 this.logout();
+            },
+            onClickAdd() {
+                this.showPop = true;
+            },
+            listenToDocument(e) {
+                let note = this.$refs.note;
+                let notebook = this.$refs.notebook;
+                if (e.target === note || e.target === notebook) {
+                    return
+                } else {
+                    this.showPop = false;
+                }
+            },
+            onFocus(e) {
+                e.target.select();
+            },
+            onAddNotebook() {
+                this.showNewNotebook = true;
+            },
+            onSubmitAddNotebook() {
+                this.createNotebooks({ title: this.newNotebookName }).then(res => {
+                    this.showNewNotebook = false;
+                    this.newNotebookName = '新文件夹';
+                    let notebook = res.data;
+                    this.addNotebooks({ notebook });
+                })
+            },
+            onDeleteNotebooks(notebook) {
+                this.deleteNotebooks({ notebookId: notebook.id }).then(res => {
+                    this.filterNotebooks({ id: notebook.id });
+                })
             }
+        },
+        watch: {
+            showPop(val) {
+                if (val) {
+                    document.addEventListener('click', this.listenToDocument);
+                } else {
+                    document.removeEventListener('click', this.listenToDocument);
+                }
+            }
+        },
+        beforeDestroy() {
+            document.removeEventListener('click', this.listenToDocument);
         }
     }
 </script>
@@ -83,6 +145,7 @@
                 align-items: center;
                 padding-left: 40px;
                 border-bottom: 1px solid $bcolor1;
+                position: relative;
                 >.icon {
                     fill: $tcolor;
                 }
@@ -104,6 +167,22 @@
                     }
                     &:hover {
                         color: $tcolor;
+                    }
+                }
+                >.popover {
+                    position: absolute;
+                    top: 50px;
+                    left: 40px;
+                    background: #fff;
+                    color: $tcolor3;
+                    cursor: pointer;
+                    border-radius: 4px;
+                    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.2);
+                    >p {
+                        padding: 10px 30px 10px 25px;
+                        &:hover {
+                            background: $hcolor2;
+                        }
                     }
                 }
             }
@@ -155,6 +234,11 @@
                 position: relative;
                 >span {
                     margin-left: 15px;
+                }
+                input {
+                    width: 150px;
+                    margin-left: 10px;
+                    padding: 4px 0 4px 5px;
                 }
                 >p {
                     width: 5px;

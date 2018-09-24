@@ -10,6 +10,12 @@ const getters = {}
 const mutations = {
     setAllNotebooks(state, payload) {
         state.allNotebooks = payload.allNotebooks;
+    },
+    addNotebooks(state, payload) {
+        state.allNotebooks.push(payload.notebook);
+    },
+    filterNotebooks(state, payload) {
+        state.allNotebooks = state.allNotebooks.filter((notebook) => notebook.id !== payload.id);
     }
 }
 
@@ -21,6 +27,10 @@ const actions = {
     },
     async createNotebooks({ commit }, { title }) {
         let res = await request({ url: url.createNotebooks, method: 'POST', data: { title } });
+        return res;
+    },
+    async deleteNotebooks({ commit }, { notebookId }) {
+        let res = await request({ url: url.deleteNotebooks.replace(':notebookId', notebookId), method: 'DELETE' });
         return res;
     }
 }
