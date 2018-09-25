@@ -6,7 +6,7 @@
                 <div class="register-info">
                     <el-input v-model.trim="username" placeholder="请输入新用户名" class="input"></el-input>
                     <el-input v-model="password" placeholder="请输入密码" class="input"></el-input>
-                    <el-input v-model="passwordConfirm" placeholder="请确认密码" class="input"></el-input>
+                    <el-input v-model="passwordConfirm" placeholder="请确认密码" class="input" @keyup.enter.native="onRegister"></el-input>
                     <el-button type="primary" @click="onRegister">快速注册</el-button>
                 </div>
                 <p class="line"></p>

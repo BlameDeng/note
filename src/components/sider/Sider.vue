@@ -4,7 +4,7 @@
             <div class="add">
                 <n-icon name="add" class="icon" @click="onClickAdd" style="cursor:pointer;"></n-icon>
                 <span @click="onClickAdd">新建文档</span>
-                <div class="popover" v-show="showPop">
+                <div class="popover" v-show="showAddPop">
                     <p ref="note" @click="onAddNote">新建笔记</p>
                     <p ref="notebook" @click="onAddNotebook">新建文件夹</p>
                 </div>
@@ -13,27 +13,27 @@
                 <n-icon name="new" class="icon"></n-icon>
                 <span>最新文档</span>
             </div>
-            <div class="my-documents" :class="{active:selectedTab==='myDocuments'}" @click="onClickTab($event,'myDocuments')">
-                <p @click="toggleCollect" :class="{active:!collectNotebooks}" ref="wenjianjiaP"></p>
+            <div class="books" :class="{active:selectedTab==='books'}" @click="onClickTab($event,'books')">
+                <p @click="toggleCollect" :class="{active:!retractNotebooks}" ref="wenjianjiaP"></p>
                 <n-icon name="wenjianjia" class="icon"></n-icon>
                 <span>我的文件夹</span>
             </div>
-            <div class="document" v-for="(notebook,index) in allNotebooks" :key="notebook.id" v-if="allNotebooks&&allNotebooks.length&&!collectNotebooks" @click.right="onRightNotebook($event,index,notebook)" :class="{active:index===clickNotebookIndex}" @click="onLeftNotebook(index)">
-                <template v-if="notebook.id!==renameNotebookId">
+            <div class="book" v-for="(book,index) in allNotebooks" :key="book.id" v-if="allNotebooks&&allNotebooks.length&&!retractNotebooks" @click.right="onRightNotebook($event,index,book)" :class="{active:index===clickNotebookIndex}" @click="onLeftNotebook(index)">
+                <template v-if="book.id!==renameNotebookId">
                     <n-icon name="wenjian" class="icon"></n-icon>
-                    <span>{{notebook.title}}</span>
-                    <p @click="onRightNotebook($event,index,notebook)" ref="wenjiaP"></p>
-                    <div class="popover" ref="documentPopover" :class="{active:notebook.id===selectedNotebookId}">
-                        <p ref="rename" @click="onRenameNotebook(notebook)">重命名</p>
-                        <p ref="cancle" @click="onDeleteNotebooks(notebook)">删除</p>
+                    <span>{{book.title}}</span>
+                    <p @click="onRightNotebook($event,index,book)" ref="wenjiaP"></p>
+                    <div class="popover" ref="bookPop" :class="{active:book.id===selectedNotebookId}">
+                        <p ref="rename" @click="onRenameNotebook(book)">重命名</p>
+                        <p ref="cancle" @click="onDeleteNotebooks(book)">删除</p>
                     </div>
                 </template>
                 <template v-else>
                     <n-icon name="wenjian" class="icon"></n-icon>
-                    <input type="text" v-model="notebooksNewName" autofocus="autofocus" @focus="onFocus" @blur="onSubmitRenameNotebook(notebook)">
+                    <input type="text" v-model="notebooksNewName" autofocus="autofocus" @focus="onFocus" @blur="onSubmitRenameNotebook(book)">
                 </template>
             </div>
-            <div class="document" v-if="showNewNotebook">
+            <div class="book" v-if="showNewNotebook">
                 <n-icon name="wenjian" class="icon"></n-icon>
                 <input type="text" v-model="newNotebookName" autofocus="autofocus" @focus="onFocus" @blur="onSubmitAddNotebook">
             </div>
@@ -49,13 +49,13 @@
                 <input type="text" placeholder="搜索...">
             </div>
             <div class="widget">
-                <div class="document" v-for="notebook in allNotebooks" :key="notebook.id" v-if="allNotebooks&&allNotebooks.length">
+                <div class="book" v-for="book in allNotebooks" :key="book.id" v-if="allNotebooks&&allNotebooks.length">
                     <div class="icon-wrapper">
                         <n-icon name="wenjian" class="icon"></n-icon>
-                        <span>{{notebook.title}}</span>
-                        <n-icon name="trash" class="icon" @click="onDeleteNotebooks(notebook)"></n-icon>
+                        <span>{{book.title}}</span>
+                        <n-icon name="trash" class="icon" @click="onDeleteNotebooks(book)"></n-icon>
                     </div>
-                    <p>{{notebook.createdAt}}</p>
+                    <p>{{book.createdAt}}</p>
                 </div>
             </div>
         </div>
@@ -69,7 +69,7 @@
         components: { 'n-icon': Icon },
         data() {
             return {
-                showPop: false,
+                showAddPop: false,
                 showNewNotebook: false,
                 newNotebookName: '新文件夹',
                 selectedTab: '',
@@ -78,7 +78,7 @@
                 rightNotebookIndex: -1,
                 notebooksNewName: '',
                 renameNotebookId: '',
-                collectNotebooks: true
+                retractNotebooks: true
             }
         },
         inject:['eventBus'],
@@ -94,23 +94,23 @@
             ]),
             ...mapMutations(['addNotebooks', 'filterNotebooks', 'updateNotebooks']),
             onAddNote() { this.eventBus.$emit('add-note'); },
-            onClickAdd() { this.showPop = true; },
+            onClickAdd() { this.showAddPop = true; },
             onClickTab(e, tab) {
                 this.selectedTab = tab;
                 this.selectedNotebookId = '';
                 this.clickNotebookIndex = -1;
                 this.rightNotebookIndex = -1;
-                if (tab === 'myDocuments' && e.target !== this.$refs.wenjianjiaP) {
-                    this.collectNotebooks = false;
+                if (tab === 'books' && e.target !== this.$refs.wenjianjiaP) {
+                    this.retractNotebooks = false;
                 }
             },
-            toggleCollect() { this.collectNotebooks = !this.collectNotebooks; },
-            listenToDocument(e) {
+            toggleCollect() { this.retractNotebooks = !this.retractNotebooks; },
+            listenAddPop(e) {
                 let note = this.$refs.note;
                 let notebook = this.$refs.notebook;
-                if (e.target === note || e.target === notebook) { return } else { this.showPop = false; }
+                if (e.target === note || e.target === notebook) { return } else { this.showAddPop = false; }
             },
-            listenToDocumentNotebook1(e) {
+            listenBookPop(e) {
                 let rename = this.$refs.rename[this.rightNotebookIndex];
                 let cancle = this.$refs.cancle[this.rightNotebookIndex];
                 if (e.target === rename || e.target === cancle) { return } else { this.selectedNotebookId = ''; }
@@ -122,6 +122,7 @@
                     this.showNewNotebook = false;
                     this.newNotebookName = '新文件夹';
                     this.addNotebooks({ notebook: res.data });
+                    this.retractNotebooks=false;
                 })
             },
             onDeleteNotebooks(notebook) {
@@ -130,20 +131,16 @@
                 })
             },
             onRightNotebook(e, index, notebook) {
-                let { offsetX: x, offsetY: y } = e;
-                if (e.target === this.$refs.wenjiaP[index]) {
-                    x = 220;
-                    y = 40;
-                }
+                let { clientX: x, clientY: y } = e;
                 this.notebookPop(x, y, index);
                 this.selectedNotebookId = notebook.id;
                 this.clickNotebookIndex = index;
                 this.rightNotebookIndex = index;
             },
             notebookPop(x, y, index) {
-                let popover = this.$refs.documentPopover[index];
-                popover.style.top = y + 'px';
-                popover.style.left = x + 'px';
+                let pop = this.$refs.bookPop[index];
+                pop.style.top = y + 'px';
+                pop.style.left = x + 'px';
             },
             onLeftNotebook(index) {
                 this.clickNotebookIndex = index;
@@ -163,18 +160,18 @@
             }
         },
         watch: {
-            showPop(val) {
+            showAddPop(val) {
                 if (val) {
-                    document.addEventListener('click', this.listenToDocument);
+                    document.addEventListener('click', this.listenAddPop);
                 } else {
-                    document.removeEventListener('click', this.listenToDocument);
+                    document.removeEventListener('click', this.listenAddPop);
                 }
             },
             selectedNotebookId(val) {
                 if (val) {
-                    document.addEventListener('click', this.listenToDocumentNotebook1);
+                    document.addEventListener('click', this.listenBookPop);
                 } else {
-                    document.removeEventListener('click', this.listenToDocumentNotebook1);
+                    document.removeEventListener('click', this.listenBookPop);
                 }
             },
             clickNotebookIndex(val) {
@@ -187,8 +184,8 @@
             this.$el.oncontextmenu = () => { return false; };
         },
         beforeDestroy() {
-            document.removeEventListener('click', this.listenToDocument);
-            document.removeEventListener('click', this.listenToDocumentNotebook1);
+            document.removeEventListener('click', this.listenAddPop);
+            document.removeEventListener('click', this.listenBookPop);
         }
     }
 </script>

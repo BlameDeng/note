@@ -5,7 +5,7 @@
             <div class="main">
                 <div class="login-info">
                     <el-input v-model.trim="username" placeholder="请输入用户名" class="input"></el-input>
-                    <el-input v-model="password" placeholder="请输入密码" class="input"></el-input>
+                    <el-input v-model="password" placeholder="请输入密码" class="input" @keyup.enter.native="onLogin"></el-input>
                     <el-button type="primary" @click="onLogin">立即登录</el-button>
                 </div>
                 <p class="line"></p>

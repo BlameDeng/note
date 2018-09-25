@@ -91,7 +91,7 @@
                 border-top: none;
             }
         }
-        >.my-documents {
+        >.books {
             height: 40px;
             cursor: pointer;
             display: flex;
@@ -126,7 +126,7 @@
                 }
             }
         }
-        >.document {
+        >.book {
             height: 40px;
             cursor: pointer;
             display: flex;
@@ -167,7 +167,7 @@
                 }
             }
             >.popover {
-                position: absolute;
+                position: fixed;
                 background: #fff;
                 color: $tcolor3;
                 cursor: pointer;
@@ -269,7 +269,7 @@
             }
         }
         >.widget {
-            >.document {
+            >.book {
                 cursor: pointer;
                 padding: 5px 0 5px 20px;
                 border-bottom: 1px solid $bcolor1;
