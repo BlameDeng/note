@@ -20,7 +20,7 @@ const mutations = {
     updateNotebooks(state, payload) {
         state.allNotebooks.map(notebook => {
             if (notebook.id === payload.notebook.id) {
-                notebook = payload.notebook
+                notebook.title = payload.notebook.title;
             }
         })
     }

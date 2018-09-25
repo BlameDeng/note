@@ -1,65 +1,65 @@
 <template>
-    <div class="sider">
-        <div class="nav">
-            <div class="add">
-                <n-icon name="add" class="icon" @click="onClickAdd" style="cursor:pointer;"></n-icon>
-                <span @click="onClickAdd">新建文档</span>
-                <div class="popover" v-show="showAddPop">
-                    <p ref="note" @click="onAddNote">新建笔记</p>
-                    <p ref="notebook" @click="onAddNotebook">新建文件夹</p>
-                </div>
-            </div>
-            <div class="recent" :class="{active:selectedTab==='recent'&&!selectedBook}" @click="onClickTab($event,'recent')">
-                <n-icon name="new" class="icon"></n-icon>
-                <span>最新文档</span>
-            </div>
-            <div class="books" :class="{active:selectedTab==='books'&&!selectedBook}" @click="onClickTab($event,'books')">
-                <p @click="toggleCollect" :class="{active:!retractNotebooks}" ref="wenjianjiaP"></p>
-                <n-icon name="wenjianjia" class="icon"></n-icon>
-                <span>我的文件夹</span>
-            </div>
-            <div class="book" v-for="(book,index) in allNotebooks" :key="book.id" v-if="allNotebooks&&allNotebooks.length&&!retractNotebooks" :class="{active:book===selectedBook}" @click="onClickBook($event,index,book)" @click.right="onClickBook($event,index,book)">
-                <template v-if="book!==renameBook">
-                    <n-icon name="wenjian" class="icon"></n-icon>
-                    <span>{{book.title}}</span>
-                    <p @click.stop="onClickBook($event,index,book)" ref="wenjiaP"></p>
-                    <div class="book-pop" ref="bookPop" v-show="showBookPop&&book===selectedBook">
-                        <p ref="rename" @click="onClickRenameBook(book)">重命名</p>
-                        <p ref="cancle" @click="onDeleteNotebooks(book)">删除</p>
-                    </div>
-                </template>
-                <template v-else>
-                    <n-icon name="wenjian" class="icon"></n-icon>
-                    <input type="text" v-model="newBookTitle" autofocus="autofocus" @focus="onFocus" @blur="onRenameBook(book)">
-                </template>
-            </div>
-            <div class="book" v-if="showNewNotebook">
-                <n-icon name="wenjian" class="icon"></n-icon>
-                <input type="text" v-model="newName" autofocus="autofocus" @focus="onFocus" @blur="onSubmitAddNotebook">
-            </div>
-            <div class="trash" :class="{active:selectedTab==='trash'&&!selectedBook}" @click="onClickTab($event,'trash')">
-                <n-icon name="trash" class="icon"></n-icon>
-                <span>回收站</span>
-                <p></p>
-            </div>
+  <div class="sider">
+    <div class="nav">
+      <div class="add">
+        <n-icon name="add" class="icon" @click="onClickAdd" style="cursor:pointer;"></n-icon>
+        <span @click="onClickAdd">新建文档</span>
+        <div class="popover" v-show="showAddPop">
+          <p ref="note" @click="onAddNote">新建笔记</p>
+          <p ref="notebook" @click="onAddNotebook">新建文件夹</p>
         </div>
-        <div class="detail">
-            <div class="search">
-                <n-icon name="search" class="icon"></n-icon>
-                <input type="text" placeholder="搜索...">
-            </div>
-            <div class="widget">
-                <div class="book" v-for="book in allNotebooks" :key="book.id" v-if="allNotebooks&&allNotebooks.length">
-                    <div class="icon-wrapper">
-                        <n-icon name="wenjian" class="icon"></n-icon>
-                        <span>{{book.title}}</span>
-                        <n-icon name="trash" class="icon" @click="onDeleteNotebooks(book)"></n-icon>
-                    </div>
-                    <p>{{book.createdAt}}</p>
-                </div>
-            </div>
-        </div>
+      </div>
+      <div class="recent" :class="{active:selectedTab==='recent'&&!selectedBook}" @click="onClickTab($event,'recent')">
+        <n-icon name="new" class="icon"></n-icon>
+        <span>最新文档</span>
+      </div>
+      <div class="books" :class="{active:selectedTab==='books'&&!selectedBook}" @click="onClickTab($event,'books')">
+        <p @click="toggleCollect" :class="{active:!retractNotebooks}" ref="wenjianjiaP"></p>
+        <n-icon name="wenjianjia" class="icon"></n-icon>
+        <span>我的文件夹</span>
+      </div>
+      <div class="book" v-for="(book,index) in allNotebooks" :key="book.id" v-if="allNotebooks&&allNotebooks.length&&!retractNotebooks" :class="{active:book===selectedBook}" @click="onClickBook($event,index,book)" @click.right="onClickBook($event,index,book)">
+        <template v-if="book!==renameBook">
+          <n-icon name="wenjian" class="icon"></n-icon>
+          <span>{{book.title}}</span>
+          <p @click.stop="onClickBook($event,index,book)" ref="wenjiaP"></p>
+          <div class="book-pop" :ref="`bookPop${index}`" v-show="showBookPop&&selectedBook.id===book.id">
+            <p ref="rename" @click="onClickRenameBook(book)">重命名</p>
+            <p ref="cancle" @click="onDeleteNotebooks(book)">删除</p>
+          </div>
+        </template>
+        <template v-else>
+          <n-icon name="wenjian" class="icon"></n-icon>
+          <input type="text" v-model="newBookTitle" autofocus="autofocus" @focus="onFocus" @blur="onRenameBook(book)" @keyup.enter="onRenameBook(book)">
+        </template>
+      </div>
+      <div class="book" v-if="showNewNotebook">
+        <n-icon name="wenjian" class="icon"></n-icon>
+        <input type="text" v-model="newName" autofocus="autofocus" @focus="onFocus" @blur="onSubmitAddNotebook">
+      </div>
+      <div class="trash" :class="{active:selectedTab==='trash'&&!selectedBook}" @click="onClickTab($event,'trash')">
+        <n-icon name="trash" class="icon"></n-icon>
+        <span>回收站</span>
+        <p></p>
+      </div>
     </div>
+    <div class="detail">
+      <div class="search">
+        <n-icon name="search" class="icon"></n-icon>
+        <input type="text" placeholder="搜索...">
+      </div>
+      <div class="widget">
+        <div class="book" v-for="book in allNotebooks" :key="book.id" v-if="allNotebooks&&allNotebooks.length">
+          <div class="icon-wrapper">
+            <n-icon name="wenjian" class="icon"></n-icon>
+            <span>{{book.title}}</span>
+            <n-icon name="trash" class="icon" @click="onDeleteNotebooks(book)"></n-icon>
+          </div>
+          <p>{{book.createdAt}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 <script>
 import Icon from "../icon.vue";
@@ -145,38 +145,40 @@ export default {
       });
     },
     onDeleteNotebooks(notebook) {
+      this.showBookPop = false;
       this.deleteNotebooks({ notebookId: notebook.id }).then(res => {
         this.filterNotebooks({ id: notebook.id });
       });
     },
     onClickBook(e, index, book) {
+      this.showBookPop = false;
       let { clientX: x, clientY: y, which } = e;
-      console.log(x,y,index)
       this.selectedBook = book;
       if (which === 1 && e.target.tagName !== "P") {
         return;
       } else {
         this.notebookPop(x, y, index);
+        this.showBookPop = true;
       }
     },
     notebookPop(x, y, index) {
-      let pop = this.$refs.bookPop[index];
+      let pop = this.$refs[`bookPop${index}`][0];
       console.log(pop)
       pop.style.top = y + "px";
       pop.style.left = x + "px";
-      this.showBookPop = true;
     },
     onClickRenameBook(book) {
       this.renameBook = book;
+      this.showBookPop = false;
       this.selectedBook = null;
       this.newBookTitle = book.title;
     },
     onRenameBook(book) {
+      book.title = this.newBookTitle;
       this.renameNotebooks({
-        title: this.newBookTitle,
+        title: book.title,
         notebookId: book.id
       }).then(res => {
-        book.title = this.newBookTitle;
         this.updateNotebooks({ notebook: book });
         this.renameBook = null;
       });
