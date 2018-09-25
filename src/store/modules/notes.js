@@ -43,7 +43,7 @@ const mutations = {
         state.trashNotes = state.trashNotes.filter(note => note.id !== payload.id)
     },
     setCurrentNote(state, payload) {
-        if (payload) {
+        if (payload&&state.notes) {
             state.currentNote = state.notes.find(note => note.id === payload.id);
         } else {
             state.currentNote = null;

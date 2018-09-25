@@ -67,17 +67,32 @@
                             <span>{{note.title}}</span>
                             <n-icon name="trash" class="icon" @click="onDeleteNote(note)"></n-icon>
                         </div>
+                        <p>{{note.content}}</p>
                         <span>{{formatDate(note.createdAt)}}</span>
                     </div>
                 </template>
                 <template v-else-if="selectedTab==='trash'">
-                    <div class="book" v-for="(note,index) in trashNotes" :key="index" v-if="trashNotes&&trashNotes.length" @click="onClickNote(note)">
+                    <div class="batch" v-if="trashNotes&&trashNotes.length">
+                        <div class="icon-wrapper">
+                            <n-icon name="piliang" class="icon"></n-icon>
+                            <span v-show="!batchType" @click="batchType=true">批量操作</span>
+                            <span v-show="batchType" @click="batchType=false">取消批量选择</span>
+                        </div>
+                        <div class="option" v-show="batchType">
+                            <span @click="onBatchDelete">批量删除</span>
+                            <span @click="onBatchRevert">批量恢复</span>
+                            <span @click="selectAll" v-show="showAllSelect">全选</span>
+                            <span @click="selectNone" v-show="!showAllSelect">取消</span>
+                        </div>
+                    </div>
+                    <div class="book" v-for="(note,index) in trashNotes" :key="index" v-if="trashNotes&&trashNotes.length" @click="onClickNote(note)" :class="{['batch-type']:batchArr.indexOf(note)>-1}">
                         <div class="icon-wrapper">
                             <n-icon name="note" class="icon"></n-icon>
                             <span>{{note.title}}</span>
-                            <n-icon name="revert" class="icon revert" @click="onRevertNote(note)"></n-icon>
+                            <n-icon name="revert" class="icon revert" @click="onRevertNote(note)" title="恢复到原文件夹"></n-icon>
                             <n-icon name="trash" class="icon" @click="onDeleteConfirm(note)"></n-icon>
                         </div>
+                        <p>{{note.content}}</p>
                         <span>{{formatDate(note.createdAt)}}</span>
                     </div>
                 </template>
@@ -85,221 +100,6 @@
         </div>
     </div>
 </template>
-<script>
-    import Icon from "../icon.vue"
-    import { mapState, mapActions, mapMutations } from "vuex"
-    export default {
-        name: "Sider",
-        components: { "n-icon": Icon },
-        data() {
-            return {
-                showAddPop: false,
-                showBookPop: false,
-                showNewBook: false,
-                newName: "新建文件夹",
-                selectedTab: "",
-                selectedBook: null,
-                selectedNote: null,
-                renameBook: null,
-                newBookTitle: "",
-                retractBooks: true
-            };
-        },
-        inject: ["eventBus"],
-        computed: {
-            ...mapState({
-                isLogin: state => state.auth.isLogin,
-                allNotebooks: state => state.notebooks.allNotebooks,
-                notes: state => state.notes.notes,
-                trashNotes: state => state.notes.trashNotes,
-                currentNote: state => state.notes.currentNote
-            })
-        },
-        created() {},
-        methods: {
-            ...mapActions([
-                "logout",
-                "getNotebooks",
-                "createNotebooks",
-                "deleteNotebooks",
-                "renameNotebooks",
-                "getNotes",
-                "deleteNote",
-                "getTrashNotes",
-                "revertNote",
-                "deleteNoteConfirm"
-            ]),
-            ...mapMutations([
-                "addNotebooks",
-                "filterNotebooks",
-                "updateNotebooks",
-                "setCurrentNote"
-            ]),
-            onAddNote() {
-                if (!this.selectedBook && this.allNotebooks && this.allNotebooks.length) {
-                    this.selectedBook = this.allNotebooks[0];
-                    this.selectedTab = '';
-                    this.retractBooks = false;
-                }
-                this.eventBus.$emit("click-add-note", this.selectedBook);
-            },
-            onClickTab(e, tab) {
-                this.selectedTab = tab;
-                this.selectedBook = null;
-                if (tab !== 'books') {
-                    // this.selectedNote = null;
-                    this.setCurrentNote(null);
-                }
-                if (tab === "books" && e.target !== this.$refs.booksTri) {
-                    this.retractBooks = false;
-                };
-                if (tab === 'trash') {
-                    this.getTrashNotes().then(res => {})
-                }
-            },
-            listenAddPop(e) {
-                // let note = this.$refs.note;
-                // let notebook = this.$refs.notebook;
-                // if (e.target === note || e.target === notebook) {
-                //     return;
-                // } else {
-                    this.showAddPop = false;
-                // }
-            },
-            listenBookPop() {
-                this.showBookPop = false;
-            },
-            onFocus(e) {
-                e.target.select();
-            },
-            onAddNotebook() {
-                this.createNotebooks({ title: this.newName }).then(res => {
-                    this.showNewBook = false;
-                    this.selectedTab = 'books';
-                    this.newName = "新建文件夹";
-                    this.addNotebooks({ notebook: res.data });
-                    this.retractBooks = false;
-                });
-            },
-            onClickDeleteBook(book) {
-                this.showBookPop = false;
-                this.deleteNotebooks({ notebookId: book.id }).then(res => {
-                    this.filterNotebooks({ id: book.id });
-                });
-            },
-            onClickBook(e, index, book) {
-                this.showBookPop = false;
-                this.selectedTab = "";
-                let { clientX: x, clientY: y, which } = e;
-                this.selectedBook = book;
-                if (which === 1 && e.target.tagName !== "P") {
-                    return;
-                } else {
-                    this.notebookPop(x, y, index);
-                    this.showBookPop = true;
-                }
-            },
-            notebookPop(x, y, index) {
-                let pop = this.$refs[`bookPop${index}`][0];
-                pop.style.top = y + 3 + "px";
-                pop.style.left = x + 3 + "px";
-            },
-            onClickRenameBook(book) {
-                this.renameBook = book;
-                this.selectedBook = null;
-                this.newBookTitle = book.title;
-            },
-            onRenameBook(book) {
-                book.title = this.newBookTitle;
-                this.renameNotebooks({
-                    title: book.title,
-                    notebookId: book.id
-                }).then(res => {
-                    this.updateNotebooks({ notebook: book });
-                    this.renameBook = null;
-                });
-            },
-            onClickNote(note) {
-                // this.selectedNote = note;
-                this.setCurrentNote(note);
-            },
-            onDeleteNote(note) {
-                this.deleteNote({ noteId: note.id }).then(res => {
-                    this.$message({
-                        type: 'info',
-                        message: '该笔记已放入回收站',
-                        duration: 1500
-                    });
-                }).catch(err => {});
-            },
-            onRevertNote(note) {
-                this.revertNote(note).then(res => {
+<script src='./Sider.js'></script>
 
-                })
-            },
-            onDeleteConfirm(note) {
-                this.$confirm('此操作将永久删除该笔记, 是否继续?', '提示', {
-                    confirmButtonText: '确定删除',
-                    cancelButtonText: '取消删除',
-                    type: 'warning'
-                }).then(() => {
-                    this.deleteNoteConfirm(note).then(res => {
-                        this.$message({
-                            type: 'success',
-                            message: '删除成功!'
-                        });
-                    })
-                }).catch(() => {
-                    this.$message({
-                        type: 'info',
-                        message: '已取消删除'
-                    });
-                });
-            }
-        },
-        watch: {
-            showAddPop(val) {
-                if (val) {
-                    document.addEventListener("click", this.listenAddPop);
-                } else {
-                    document.removeEventListener("click", this.listenAddPop);
-                }
-            },
-            showBookPop(val) {
-                if (val) {
-                    document.addEventListener("click", this.listenBookPop);
-                } else {
-                    document.removeEventListener("click", this.listenBookPop);
-                }
-            },
-            selectedBook(val) {
-                if (val) {
-                    this.getNotes({ notebookId: val.id }).then(res => {});
-                }
-            },
-            // selectedNote: {
-            //     handler(val) {
-            //         let id;
-            //         if (val) { id = val.id; }
-            //         console.log(id);
-            //         this.eventBus.$emit('click-note', id);
-            //     },
-            //     deep: true
-            // }
-        },
-        mounted() {
-            this.$el.oncontextmenu = () => {
-                return false;
-            };
-            // this.eventBus.$on('note-created', (note) => {
-            //     console.log(note)
-            //     this.selectedNote = note;
-            // })
-        },
-        beforeDestroy() {
-            document.removeEventListener("click", this.listenAddPop);
-            document.removeEventListener("click", this.listenBookPop);
-        }
-    };
-</script>
 <style lang="scss" scoped src='./Sider.scss'></style>
