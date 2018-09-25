@@ -10,7 +10,7 @@ const url = {
     createNote: '/notes/to/:notebookId',
     getNotes: '/notes/from/:notebookId',
     deleteNote: '/notes/:noteId',
-    modifyNote: '/notes/:noteId',
+    patchNote: '/notes/:noteId',
     deleteNoteConfirm: '/notes/:noteId/confirm',
     revertNote: '/notes/:noteId/revert',
     getTrashNote: '/notes/trash'

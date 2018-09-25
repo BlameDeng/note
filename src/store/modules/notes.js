@@ -25,6 +25,14 @@ const mutations = {
     },
     deleteNote(state, payload) {
         state.notes = state.notes.filter(note => note.id !== payload.noteId)
+    },
+    updateNote(state, payload) {
+        state.notes.map(note => {
+            if (note.id === payload.noteId) {
+                note.title = payload.title;
+                note.content = payload.content;
+            }
+        })
     }
 }
 
@@ -50,6 +58,15 @@ const actions = {
             method: 'DELETE'
         });
         commit('deleteNote', { noteId });
+        return res;
+    },
+    async patchNote({ commit }, { noteId, title, content }) {
+        let res = await request({
+            url: url.patchNote.replace(':noteId', noteId),
+            method: 'PATCH',
+            data: { title, content }
+        });
+        commit('updateNote', { noteId, title, content });
         return res;
     }
 }

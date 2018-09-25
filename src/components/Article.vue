@@ -2,7 +2,7 @@
     <div class="article">
         <div class="title-bar">
             <template v-if="editing&&note">
-                <input type="text" v-model="note.title">
+                <input type="text" v-model.trim="note.title">
                 <el-button plain class="el-btn" @click="onSaveNote">保存</el-button>
             </template>
         </div>
@@ -21,9 +21,7 @@
         name: 'Article',
         data() {
             return {
-                title: '无标题笔记',
                 editing: false,
-                content: '',
                 book: null,
                 note: null,
             }
@@ -33,7 +31,7 @@
         created() {
             this.eventBus.$on('add-note', (book) => {
                 this.editing = true;
-                this.book=book;
+                this.book = book;
                 this.createNote({
                     notebookId: this.book.id,
                     title: '无标题笔记',
@@ -48,8 +46,16 @@
             })
         },
         methods: {
-            ...mapActions(['createNote']),
-            onSaveNote() {}
+            ...mapActions(['createNote', 'patchNote']),
+            onSaveNote() {
+                this.patchNote({
+                    noteId: this.note.id,
+                    title: this.note.title,
+                    content: this.note.content
+                }).then(res => {
+                    console.log(res)
+                })
+            }
         }
     }
 </script>
