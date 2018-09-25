@@ -163,9 +163,9 @@ export default {
     },
     notebookPop(x, y, index) {
       let pop = this.$refs[`bookPop${index}`][0];
-      console.log(pop)
-      pop.style.top = y + "px";
-      pop.style.left = x + "px";
+      console.log(pop);
+      pop.style.top = y + 3 + "px";
+      pop.style.left = x + 3 + "px";
     },
     onClickRenameBook(book) {
       this.renameBook = book;
