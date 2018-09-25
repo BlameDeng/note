@@ -1,27 +1,51 @@
 <template>
     <div class="article">
         <div class="title-bar">
-            <input type="text" v-model="title">
-            <el-button plain class="el-btn">保存</el-button>
+            <template v-if="editing">
+                <input type="text" v-model="title">
+                <el-button plain class="el-btn" @click="onCreateNote">保存</el-button>
+            </template>
         </div>
         <div class="tool-bar"></div>
         <div class="context">
-            <textarea></textarea>
+            <textarea v-model="content"></textarea>
         </div>
     </div>
 </template>
 <script>
+    import marked from 'marked'
+    import { mapActions } from 'vuex'
     export default {
         name: 'Article',
         data() {
-            return { title: '无标题笔记' }
+            return {
+                title: '无标题笔记',
+                editing: false,
+                content: '',
+                book: null
+            }
         },
         inject: ['eventBus'],
         created() {
-this.eventBus.$on('add-note',()=>{
-    console.log('shoudaole')
-})
+            this.eventBus.$on('add-note', () => {
+                this.editing = true;
+            });
+            this.eventBus.$on('selected-book-change', (book) => {
+                this.book = book;
+            })
         },
+        methods: {
+            ...mapActions(['createNote']),
+            onCreateNote() {
+                this.createNote({
+                    notebookId: this.book.id,
+                    title: this.title,
+                    content: this.content
+                }).then(res => {
+                    console.log(res)
+                }).catch(err => {})
+            }
+        }
     }
 </script>
 <style lang="scss" scoped>

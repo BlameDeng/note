@@ -173,7 +173,6 @@
                 cursor: pointer;
                 border-radius: 4px;
                 box-shadow: 0 1px 8px rgba(0, 0, 0, 0.2);
-                // display: none;
                 z-index: 1;
                 >p {
                     white-space: nowrap;
@@ -190,9 +189,6 @@
                         background: $hcolor2;
                     }
                 }
-                // &.active {
-                //     display: block;
-                // }
             }
         }
         >.trash {
@@ -286,11 +282,7 @@
                             margin-left: auto;
                             margin-right: 20px;
                             font-size: 16px;
-                            display: none;
-                            fill: $tcolor2;
-                            &:hover {
-                                fill: $tcolor;
-                            }
+                            fill: transparent;
                         }
                     }
                 }
@@ -303,7 +295,10 @@
                     >.icon-wrapper {
                         >.icon {
                             &:last-child {
-                                display: inline;
+                                fill: $tcolor2;
+                                &:hover {
+                                    fill: $tcolor;
+                                }
                             }
                         }
                     }
