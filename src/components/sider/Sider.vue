@@ -76,7 +76,7 @@
                             <n-icon name="note" class="icon"></n-icon>
                             <span>{{note.title}}</span>
                             <n-icon name="revert" class="icon revert" @click="onRevertNote(note)"></n-icon>
-                            <n-icon name="trash" class="icon" @click="onDeleteNote(note)"></n-icon>
+                            <n-icon name="trash" class="icon" @click="onDeleteConfirm(note)"></n-icon>
                         </div>
                         <p>{{note.createdAt}}</p>
                     </div>
@@ -123,7 +123,8 @@
                 "getNotes",
                 "deleteNote",
                 "getTrashNotes",
-                "revertNote"
+                "revertNote",
+                "deleteNoteConfirm"
             ]),
             ...mapMutations(["addNotebooks", "filterNotebooks", "updateNotebooks"]),
             onAddNote(book) {
@@ -221,9 +222,28 @@
                 }).catch(err => {});
             },
             onRevertNote(note) {
-                this.revertNote(note).then(res=>{
+                this.revertNote(note).then(res => {
                     console.log(res);
                 })
+            },
+            onDeleteConfirm(note) {
+                this.$confirm('此操作将永久删除该笔记, 是否继续?', '提示', {
+                    confirmButtonText: '确定删除',
+                    cancelButtonText: '取消删除',
+                    type: 'warning'
+                }).then(() => {
+                    this.deleteNoteConfirm(note).then(res => {
+                        this.$message({
+                            type: 'success',
+                            message: '删除成功!'
+                        });
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });
             }
         },
         watch: {

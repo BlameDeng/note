@@ -88,6 +88,14 @@ const actions = {
         });
         commit('updateTrashNotes', note);
         return res;
+    },
+    async deleteNoteConfirm({ commit }, note) {
+        let res = await request({
+            url: url.deleteNoteConfirm.replace(':noteId', note.id),
+            method: 'DELETE'
+        });
+        commit('updateTrashNotes', note);
+        return res;
     }
 }
 
