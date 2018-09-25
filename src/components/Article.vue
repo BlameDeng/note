@@ -1,20 +1,22 @@
 <template>
     <div class="article">
         <div class="title-bar">
-            <template v-if="editing">
-                <input type="text" v-model="title">
-                <el-button plain class="el-btn" @click="onCreateNote">保存</el-button>
+            <template v-if="editing&&note">
+                <input type="text" v-model="note.title">
+                <el-button plain class="el-btn" @click="onSaveNote">保存</el-button>
             </template>
         </div>
         <div class="tool-bar"></div>
         <div class="context">
-            <textarea v-model="content"></textarea>
+            <template v-if="editing&&note">
+                <textarea v-model="note.content"></textarea>
+            </template>
         </div>
     </div>
 </template>
 <script>
     import marked from 'marked'
-    import { mapActions } from 'vuex'
+    import { mapActions, mapGetters } from 'vuex'
     export default {
         name: 'Article',
         data() {
@@ -22,29 +24,32 @@
                 title: '无标题笔记',
                 editing: false,
                 content: '',
-                book: null
+                book: null,
+                note: null,
             }
         },
+        computed: {},
         inject: ['eventBus'],
         created() {
-            this.eventBus.$on('add-note', () => {
+            this.eventBus.$on('add-note', (book) => {
                 this.editing = true;
+                this.book=book;
+                this.createNote({
+                    notebookId: this.book.id,
+                    title: '无标题笔记',
+                    content: ''
+                }).then(res => {
+                    console.log(res)
+                }).catch(err => {});
             });
-            this.eventBus.$on('selected-book-change', (book) => {
-                this.book = book;
+            this.eventBus.$on('click-note', (noteId) => {
+                this.note = this.$store.getters.getNoteById(noteId);
+                this.editing = true;
             })
         },
         methods: {
             ...mapActions(['createNote']),
-            onCreateNote() {
-                this.createNote({
-                    notebookId: this.book.id,
-                    title: this.title,
-                    content: this.content
-                }).then(res => {
-                    console.log(res)
-                }).catch(err => {})
-            }
+            onSaveNote() {}
         }
     }
 </script>

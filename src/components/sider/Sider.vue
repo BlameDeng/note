@@ -5,7 +5,7 @@
                 <n-icon name="add" class="icon" @click="showAddPop = true" style="cursor:pointer;"></n-icon>
                 <span @click="showAddPop = true">新建文档</span>
                 <div class="popover" v-show="showAddPop">
-                    <p ref="note" @click="onAddNote">新建笔记</p>
+                    <p ref="note" @click="onAddNote()">新建笔记</p>
                     <p ref="notebook" @click="showNewBook = true">新建文件夹</p>
                 </div>
             </div>
@@ -24,6 +24,7 @@
                     <span>{{book.title}}</span>
                     <p @click.stop="onClickBook($event,index,book)" ref="bookTri"></p>
                     <div class="book-pop" :ref="`bookPop${index}`" v-show="showBookPop&&selectedBook.id===book.id">
+                        <p ref="addNote" @click="onAddNote(book)">新建笔记</p>
                         <p ref="rename" @click="onClickRenameBook(book)">重命名</p>
                         <p ref="cancle" @click="onClickDeleteBook(book)">删除</p>
                     </div>
@@ -60,11 +61,11 @@
                     </div>
                 </template>
                 <template v-if="selectedBook">
-                    <div class="book" v-for="(note,index) in notes" :key="index" v-if="notes&&notes.length">
+                    <div class="book" v-for="(note,index) in notes" :key="index" v-if="notes&&notes.length" @click="onClickNote(note)">
                         <div class="icon-wrapper">
                             <n-icon name="note" class="icon"></n-icon>
                             <span>{{note.title}}</span>
-                            <n-icon name="trash" class="icon"></n-icon>
+                            <n-icon name="trash" class="icon" @click="onDeleteNote(note)"></n-icon>
                         </div>
                         <p>{{note.createdAt}}</p>
                     </div>
@@ -107,15 +108,21 @@
                 "createNotebooks",
                 "deleteNotebooks",
                 "renameNotebooks",
-                "getNotes"
+                "getNotes",
+                "deleteNote"
             ]),
             ...mapMutations(["addNotebooks", "filterNotebooks", "updateNotebooks"]),
-            onAddNote() {
-                if (!this.selectedBook && this.allNotebooks && this.allNotebooks.length) {
-                    this.selectedBook = this.allNotebooks[0];
-                    this.retractBooks = false;
+            onAddNote(book) {
+                if (book) {
+                    this.eventBus.$emit("add-note", book);
+                } else {
+                    if (!this.selectedBook && this.allNotebooks && this.allNotebooks.length) {
+                        this.selectedBook = this.allNotebooks[0];
+                        this.selectedTab = '';
+                        this.retractBooks = false;
+                    }
+                    this.eventBus.$emit("add-note", this.selectedBook);
                 }
-                this.eventBus.$emit("add-note");
             },
             onClickTab(e, tab) {
                 this.selectedTab = tab;
@@ -185,6 +192,14 @@
                     this.updateNotebooks({ notebook: book });
                     this.renameBook = null;
                 });
+            },
+            onClickNote(note) {
+                this.eventBus.$emit('click-note', note.id);
+            },
+            onDeleteNote(note) {
+                this.deleteNote({ noteId: note.id }).then(res => {
+                    console.log(res)
+                }).catch(err => {});
             }
         },
         watch: {
@@ -203,10 +218,9 @@
                 }
             },
             selectedBook(val) {
-                this.eventBus.$emit('selected-book-change', val);
                 if (val) {
                     this.getNotes({ notebookId: val.id }).then(res => {
-                        console.log(res)
+
                     })
                 }
             }

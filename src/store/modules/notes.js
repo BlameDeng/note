@@ -6,7 +6,13 @@ const state = {
 }
 
 const getters = {
-
+    getNoteById: (state) => {
+        return (noteId) => {
+            if (state.notes && state.notes.length) {
+                return state.notes.find(note => note.id === noteId);
+            }
+        }
+    }
 }
 
 const mutations = {
@@ -16,6 +22,9 @@ const mutations = {
     addNote(state, payload) {
         state.notes = state.notes || [];
         state.notes.push(payload.note);
+    },
+    deleteNote(state, payload) {
+        state.notes = state.notes.filter(note => note.id !== payload.noteId)
     }
 }
 
@@ -36,7 +45,11 @@ const actions = {
         return res;
     },
     async deleteNote({ commit }, { noteId }) {
-        let res = await request({ url: url.deleteNote.replace(':noteId', noteId) });
+        let res = await request({
+            url: url.deleteNote.replace(':noteId', noteId),
+            method: 'DELETE'
+        });
+        commit('deleteNote', { noteId });
         return res;
     }
 }
