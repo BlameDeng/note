@@ -13,6 +13,6 @@ const url = {
     patchNote: '/notes/:noteId',
     deleteNoteConfirm: '/notes/:noteId/confirm',
     revertNote: '/notes/:noteId/revert',
-    getTrashNote: '/notes/trash'
+    getTrashNotes: '/notes/trash'
 }
 export default url

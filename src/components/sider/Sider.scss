@@ -12,7 +12,7 @@
         background: #eee;
         border-right: 1px solid $bcolor1;
         font-size: 12px;
-        height: 800px;
+
         >.add {
             height: 60px;
             display: flex;
@@ -232,7 +232,7 @@
         width: 250px;
         flex-grow: 0;
         flex-shrink: 0;
-        height: 800px;
+
         border-right: 1px solid $bcolor1;
         >.search {
             height: 60px;
@@ -274,6 +274,7 @@
                     justify-content: flex-start;
                     align-items: center;
                     padding: 10px 0;
+                    position: relative;
                     >span {
                         margin-left: 10px;
                     }
@@ -281,6 +282,14 @@
                         &:last-child {
                             margin-left: auto;
                             margin-right: 20px;
+                            font-size: 16px;
+                            fill: transparent;
+                        }
+                        &.revert {
+                            position: absolute;
+                            top: 50%;
+                            right: 43px;
+                            transform: translateY(-50%);
                             font-size: 16px;
                             fill: transparent;
                         }
@@ -295,6 +304,12 @@
                     >.icon-wrapper {
                         >.icon {
                             &:last-child {
+                                fill: $tcolor2;
+                                &:hover {
+                                    fill: $tcolor;
+                                }
+                            }
+                            &.revert {
                                 fill: $tcolor2;
                                 &:hover {
                                     fill: $tcolor;

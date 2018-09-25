@@ -2,7 +2,8 @@ import url from '@/api/url.js'
 import request from '@/helpers/request.js'
 
 const state = {
-    notes: null
+    notes: null,
+    trashNotes: null
 }
 
 const getters = {
@@ -33,6 +34,12 @@ const mutations = {
                 note.content = payload.content;
             }
         })
+    },
+    setTrashNotes(state, payload) {
+        state.trashNotes = payload.trashNotes;
+    },
+    updateTrashNotes(state, payload) {
+        state.trashNotes = state.trashNotes.filter(note => note.id !== payload.id)
     }
 }
 
@@ -67,6 +74,19 @@ const actions = {
             data: { title, content }
         });
         commit('updateNote', { noteId, title, content });
+        return res;
+    },
+    async getTrashNotes({ commit }) {
+        let res = await request({ url: url.getTrashNotes });
+        commit('setTrashNotes', { trashNotes: res.data });
+        return res;
+    },
+    async revertNote({ commit }, note) {
+        let res = await request({
+            url: url.revertNote.replace(':noteId', note.id),
+            method: 'PATCH'
+        });
+        commit('updateTrashNotes', note);
         return res;
     }
 }

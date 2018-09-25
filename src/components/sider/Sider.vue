@@ -70,6 +70,17 @@
                         <p>{{note.createdAt}}</p>
                     </div>
                 </template>
+                <template v-else-if="selectedTab==='trash'">
+                    <div class="book" v-for="(note,index) in trashNotes" :key="index" v-if="trashNotes&&trashNotes.length" @click="onClickNote(note)">
+                        <div class="icon-wrapper">
+                            <n-icon name="note" class="icon"></n-icon>
+                            <span>{{note.title}}</span>
+                            <n-icon name="revert" class="icon revert" @click="onRevertNote(note)"></n-icon>
+                            <n-icon name="trash" class="icon" @click="onDeleteNote(note)"></n-icon>
+                        </div>
+                        <p>{{note.createdAt}}</p>
+                    </div>
+                </template>
             </div>
         </div>
     </div>
@@ -98,7 +109,8 @@
             ...mapState({
                 isLogin: state => state.auth.isLogin,
                 allNotebooks: state => state.notebooks.allNotebooks,
-                notes: state => state.notes.notes
+                notes: state => state.notes.notes,
+                trashNotes: state => state.notes.trashNotes
             })
         },
         methods: {
@@ -109,7 +121,9 @@
                 "deleteNotebooks",
                 "renameNotebooks",
                 "getNotes",
-                "deleteNote"
+                "deleteNote",
+                "getTrashNotes",
+                "revertNote"
             ]),
             ...mapMutations(["addNotebooks", "filterNotebooks", "updateNotebooks"]),
             onAddNote(book) {
@@ -129,6 +143,11 @@
                 this.selectedBook = null;
                 if (tab === "books" && e.target !== this.$refs.booksTri) {
                     this.retractBooks = false;
+                };
+                if (tab === 'trash') {
+                    this.getTrashNotes().then(res => {
+
+                    })
                 }
             },
             listenAddPop(e) {
@@ -200,6 +219,11 @@
                 this.deleteNote({ noteId: note.id }).then(res => {
                     console.log(res)
                 }).catch(err => {});
+            },
+            onRevertNote(note) {
+                this.revertNote(note).then(res=>{
+                    console.log(res);
+                })
             }
         },
         watch: {
