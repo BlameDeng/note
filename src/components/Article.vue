@@ -2,58 +2,55 @@
     <div class="article">
         <div class="title-bar">
             <template v-if="editing&&note">
-                <input type="text" v-model.trim="note.title">
+                <input type="text" v-model.trim="note.title" ref="input">
                 <el-button plain class="el-btn" @click="onSaveNote">保存</el-button>
             </template>
         </div>
         <div class="tool-bar"></div>
         <div class="context">
             <template v-if="editing&&note">
-                <textarea v-model="note.content"></textarea>
+                <textarea v-model="note.content" ref="textarea"></textarea>
             </template>
         </div>
     </div>
 </template>
 <script>
     import marked from 'marked'
-    import { mapActions, mapGetters } from 'vuex'
+    import { mapActions, mapGetters, mapState, mapMutations } from 'vuex'
     export default {
         name: 'Article',
         data() {
             return {
-                editing: false,
-                book: null,
-                note: null,
+                editing: true,
             }
         },
-        computed: {},
+        computed: {
+            ...mapState({
+                note: state => state.notes.currentNote
+            })
+        },
         inject: ['eventBus'],
         created() {
-            this.eventBus.$on('add-note', (book) => {
-                this.editing = true;
-                this.book = book;
+            this.eventBus.$on('click-add-note', (book) => {
                 this.createNote({
-                    notebookId: this.book.id,
-                    title: '无标题笔记',
+                    notebookId: book.id,
+                    title: `无标题笔记 ${this.formatDate(new Date())}`,
                     content: ''
                 }).then(res => {
-                    console.log(res)
+                    this.$refs.input.select();
                 }).catch(err => {});
             });
-            this.eventBus.$on('click-note', (noteId) => {
-                this.note = this.$store.getters.getNoteById(noteId);
-                this.editing = true;
-            })
         },
         methods: {
             ...mapActions(['createNote', 'patchNote']),
+            ...mapMutations(['setCurrentNote']),
             onSaveNote() {
                 this.patchNote({
                     noteId: this.note.id,
                     title: this.note.title,
                     content: this.note.content
                 }).then(res => {
-                    console.log(res)
+                    
                 })
             }
         }
@@ -63,7 +60,7 @@
     @import '@/assets/base.scss';
     .article {
         width: 100%;
-        height: 800px;
+        height: 100%;
         >.title-bar {
             height: 60px;
             flex-grow: 1;

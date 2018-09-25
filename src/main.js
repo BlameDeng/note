@@ -9,6 +9,8 @@ import store from '@/store'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 Vue.use(ElementUI);
+import formatDate from '@/helpers/formatDate.js'
+Vue.use(formatDate);
 
 Vue.config.productionTip = false
 

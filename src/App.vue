@@ -18,6 +18,8 @@
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         color: #303133;
+        width: 100%;
+        height: 100%;
     }
     *,
     *::before,
@@ -25,6 +27,10 @@
         margin: 0;
         padding: 0;
         box-sizing: border-box;
+    }
+    html, body {
+        width: 100%;
+        height: 100%;
     }
     img {
         vertical-align: middle;

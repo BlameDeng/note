@@ -3,7 +3,8 @@ import request from '@/helpers/request.js'
 
 const state = {
     notes: null,
-    trashNotes: null
+    trashNotes: null,
+    currentNote: null
 }
 
 const getters = {
@@ -40,6 +41,13 @@ const mutations = {
     },
     updateTrashNotes(state, payload) {
         state.trashNotes = state.trashNotes.filter(note => note.id !== payload.id)
+    },
+    setCurrentNote(state, payload) {
+        if (payload) {
+            state.currentNote = state.notes.find(note => note.id === payload.id);
+        } else {
+            state.currentNote = null;
+        }
     }
 }
 
@@ -52,6 +60,7 @@ const actions = {
         });
         let note = { notebookId, ...res.data };
         commit('addNote', { note });
+        commit('setCurrentNote', note);
         return res;
     },
     async getNotes({ commit }, { notebookId }) {
@@ -74,6 +83,7 @@ const actions = {
             data: { title, content }
         });
         commit('updateNote', { noteId, title, content });
+        commit('setCurrentNote', { id: noteId });
         return res;
     },
     async getTrashNotes({ commit }) {

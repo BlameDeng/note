@@ -5,7 +5,7 @@
                 <n-icon name="add" class="icon" @click="showAddPop = true" style="cursor:pointer;"></n-icon>
                 <span @click="showAddPop = true">新建文档</span>
                 <div class="popover" v-show="showAddPop">
-                    <p ref="note" @click="onAddNote()">新建笔记</p>
+                    <p ref="note" @click="onAddNote">新建笔记</p>
                     <p ref="notebook" @click="showNewBook = true">新建文件夹</p>
                 </div>
             </div>
@@ -24,7 +24,7 @@
                     <span>{{book.title}}</span>
                     <p @click.stop="onClickBook($event,index,book)" ref="bookTri"></p>
                     <div class="book-pop" :ref="`bookPop${index}`" v-show="showBookPop&&selectedBook.id===book.id">
-                        <p ref="addNote" @click="onAddNote(book)">新建笔记</p>
+                        <p ref="addNote" @click="onAddNote">新建笔记</p>
                         <p ref="rename" @click="onClickRenameBook(book)">重命名</p>
                         <p ref="cancle" @click="onClickDeleteBook(book)">删除</p>
                     </div>
@@ -51,23 +51,23 @@
             </div>
             <div class="widget">
                 <template v-if="selectedTab==='books'">
-                    <div class="book" v-for="book in allNotebooks" :key="book.id" v-if="allNotebooks&&allNotebooks.length">
+                    <div class="book" v-for="(book,index) in allNotebooks" :key="index" v-if="allNotebooks&&allNotebooks.length" @click="onClickBook($event, index, book)">
                         <div class="icon-wrapper">
                             <n-icon name="wenjian" class="icon"></n-icon>
                             <span>{{book.title}}</span>
                             <n-icon name="trash" class="icon" @click="onClickDeleteBook(book)"></n-icon>
                         </div>
-                        <p>{{book.createdAt}}</p>
+                        <span>{{formatDate(book.createdAt)}}</span>
                     </div>
                 </template>
                 <template v-if="selectedBook">
-                    <div class="book" v-for="(note,index) in notes" :key="index" v-if="notes&&notes.length" @click="onClickNote(note)">
+                    <div class="book" v-for="(note,index) in notes" :key="index" v-if="notes&&notes.length" @click="onClickNote(note)" :class="{active:currentNote&&currentNote.id===note.id}">
                         <div class="icon-wrapper">
                             <n-icon name="note" class="icon"></n-icon>
                             <span>{{note.title}}</span>
                             <n-icon name="trash" class="icon" @click="onDeleteNote(note)"></n-icon>
                         </div>
-                        <p>{{note.createdAt}}</p>
+                        <span>{{formatDate(note.createdAt)}}</span>
                     </div>
                 </template>
                 <template v-else-if="selectedTab==='trash'">
@@ -78,7 +78,7 @@
                             <n-icon name="revert" class="icon revert" @click="onRevertNote(note)"></n-icon>
                             <n-icon name="trash" class="icon" @click="onDeleteConfirm(note)"></n-icon>
                         </div>
-                        <p>{{note.createdAt}}</p>
+                        <span>{{formatDate(note.createdAt)}}</span>
                     </div>
                 </template>
             </div>
@@ -86,8 +86,8 @@
     </div>
 </template>
 <script>
-    import Icon from "../icon.vue";
-    import { mapState, mapActions, mapMutations } from "vuex";
+    import Icon from "../icon.vue"
+    import { mapState, mapActions, mapMutations } from "vuex"
     export default {
         name: "Sider",
         components: { "n-icon": Icon },
@@ -99,6 +99,7 @@
                 newName: "新建文件夹",
                 selectedTab: "",
                 selectedBook: null,
+                selectedNote: null,
                 renameBook: null,
                 newBookTitle: "",
                 retractBooks: true
@@ -110,9 +111,11 @@
                 isLogin: state => state.auth.isLogin,
                 allNotebooks: state => state.notebooks.allNotebooks,
                 notes: state => state.notes.notes,
-                trashNotes: state => state.notes.trashNotes
+                trashNotes: state => state.notes.trashNotes,
+                currentNote: state => state.notes.currentNote
             })
         },
+        created() {},
         methods: {
             ...mapActions([
                 "logout",
@@ -126,39 +129,42 @@
                 "revertNote",
                 "deleteNoteConfirm"
             ]),
-            ...mapMutations(["addNotebooks", "filterNotebooks", "updateNotebooks"]),
-            onAddNote(book) {
-                if (book) {
-                    this.eventBus.$emit("add-note", book);
-                } else {
-                    if (!this.selectedBook && this.allNotebooks && this.allNotebooks.length) {
-                        this.selectedBook = this.allNotebooks[0];
-                        this.selectedTab = '';
-                        this.retractBooks = false;
-                    }
-                    this.eventBus.$emit("add-note", this.selectedBook);
+            ...mapMutations([
+                "addNotebooks",
+                "filterNotebooks",
+                "updateNotebooks",
+                "setCurrentNote"
+            ]),
+            onAddNote() {
+                if (!this.selectedBook && this.allNotebooks && this.allNotebooks.length) {
+                    this.selectedBook = this.allNotebooks[0];
+                    this.selectedTab = '';
+                    this.retractBooks = false;
                 }
+                this.eventBus.$emit("click-add-note", this.selectedBook);
             },
             onClickTab(e, tab) {
                 this.selectedTab = tab;
                 this.selectedBook = null;
+                if (tab !== 'books') {
+                    // this.selectedNote = null;
+                    this.setCurrentNote(null);
+                }
                 if (tab === "books" && e.target !== this.$refs.booksTri) {
                     this.retractBooks = false;
                 };
                 if (tab === 'trash') {
-                    this.getTrashNotes().then(res => {
-
-                    })
+                    this.getTrashNotes().then(res => {})
                 }
             },
             listenAddPop(e) {
-                let note = this.$refs.note;
-                let notebook = this.$refs.notebook;
-                if (e.target === note || e.target === notebook) {
-                    return;
-                } else {
+                // let note = this.$refs.note;
+                // let notebook = this.$refs.notebook;
+                // if (e.target === note || e.target === notebook) {
+                //     return;
+                // } else {
                     this.showAddPop = false;
-                }
+                // }
             },
             listenBookPop() {
                 this.showBookPop = false;
@@ -214,16 +220,21 @@
                 });
             },
             onClickNote(note) {
-                this.eventBus.$emit('click-note', note.id);
+                // this.selectedNote = note;
+                this.setCurrentNote(note);
             },
             onDeleteNote(note) {
                 this.deleteNote({ noteId: note.id }).then(res => {
-                    console.log(res)
+                    this.$message({
+                        type: 'info',
+                        message: '该笔记已放入回收站',
+                        duration: 1500
+                    });
                 }).catch(err => {});
             },
             onRevertNote(note) {
                 this.revertNote(note).then(res => {
-                    console.log(res);
+
                 })
             },
             onDeleteConfirm(note) {
@@ -263,16 +274,27 @@
             },
             selectedBook(val) {
                 if (val) {
-                    this.getNotes({ notebookId: val.id }).then(res => {
-
-                    })
+                    this.getNotes({ notebookId: val.id }).then(res => {});
                 }
-            }
+            },
+            // selectedNote: {
+            //     handler(val) {
+            //         let id;
+            //         if (val) { id = val.id; }
+            //         console.log(id);
+            //         this.eventBus.$emit('click-note', id);
+            //     },
+            //     deep: true
+            // }
         },
         mounted() {
             this.$el.oncontextmenu = () => {
                 return false;
             };
+            // this.eventBus.$on('note-created', (note) => {
+            //     console.log(note)
+            //     this.selectedNote = note;
+            // })
         },
         beforeDestroy() {
             document.removeEventListener("click", this.listenAddPop);

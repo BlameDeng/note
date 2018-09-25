@@ -45,7 +45,7 @@
                 this.login({ username: this.username, password: this.password }).then(res => {
                     this.$router.push('/file');
                 }).catch((err) => {
-                   
+
                 })
             },
             onToRegister() {
