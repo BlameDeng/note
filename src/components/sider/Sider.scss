@@ -166,14 +166,14 @@
                     }
                 }
             }
-            >.popover {
+            >.book-pop {
                 position: fixed;
                 background: #fff;
                 color: $tcolor3;
                 cursor: pointer;
                 border-radius: 4px;
                 box-shadow: 0 1px 8px rgba(0, 0, 0, 0.2);
-                display: none;
+                // display: none;
                 z-index: 1;
                 >p {
                     white-space: nowrap;
@@ -190,9 +190,9 @@
                         background: $hcolor2;
                     }
                 }
-                &.active {
-                    display: block;
-                }
+                // &.active {
+                //     display: block;
+                // }
             }
         }
         >.trash {
