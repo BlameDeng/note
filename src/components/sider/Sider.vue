@@ -60,7 +60,7 @@
                     </div>
                 </template>
                 <template v-if="selectedBook">
-                    <div class="book" v-for="note in notes" :key="note.id" v-if="notes&&notes.length">
+                    <div class="book" v-for="(note,index) in notes" :key="index" v-if="notes&&notes.length">
                         <div class="icon-wrapper">
                             <n-icon name="note" class="icon"></n-icon>
                             <span>{{note.title}}</span>

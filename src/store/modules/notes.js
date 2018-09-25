@@ -12,6 +12,10 @@ const getters = {
 const mutations = {
     setNotes(state, payload) {
         state.notes = payload.notes;
+    },
+    addNote(state, payload) {
+        state.notes = state.notes || [];
+        state.notes.push(payload.note);
     }
 }
 
@@ -22,11 +26,13 @@ const actions = {
             method: 'POST',
             data: { title, content }
         });
+        let note = { notebookId, ...res.data };
+        commit('addNote', { note });
         return res;
     },
     async getNotes({ commit }, { notebookId }) {
         let res = await request({ url: url.getNotes.replace(':notebookId', notebookId) });
-        commit('setNotes',{notes:res.data});
+        commit('setNotes', { notes: res.data });
         return res;
     },
     async deleteNote({ commit }, { noteId }) {
