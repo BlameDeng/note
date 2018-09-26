@@ -27,11 +27,6 @@ export default {
             inserted: function(el) {
                 el.select();
             }
-        },
-        focus: {
-            inserted: function(el) {
-                el.focus();
-            }
         }
     },
     computed: {
@@ -91,14 +86,14 @@ export default {
         },
         onClickAddBook() {
             this.showNewBook = true;
-            this.selectedTab = 'books';
+            // this.selectedTab = 'books';
             this.retractBooks = false;
         },
         onAddNotebook() {
             if (this.creating) { return }
             this.creating = true;
+            this.showNewBook = false;
             this.createNotebooks({ title: this.newName }).then(res => {
-                this.showNewBook = false;
                 this.newName = "新建文件夹";
                 this.addNotebooks({ notebook: res.data });
                 this.creating = false;
@@ -107,6 +102,11 @@ export default {
         onClickDeleteBook(book) {
             this.showBookPop = false;
             this.deleteNotebooks({ notebookId: book.id }).then(res => {
+                this.$message({
+                    type: 'info',
+                    message: '该文件夹已删除',
+                    duration: 1500
+                });
                 this.filterNotebooks({ id: book.id });
             });
         },
@@ -133,8 +133,8 @@ export default {
             this.newBookTitle = book.title;
         },
         onRenameBook(book) {
-            if(this.changing){return}
-            this.changing=true;
+            if (this.changing) { return }
+            this.changing = true;
             book.title = this.newBookTitle;
             this.renameNotebooks({
                 title: book.title,
@@ -142,7 +142,7 @@ export default {
             }).then(res => {
                 this.updateNotebooks({ notebook: book });
                 this.renameBook = null;
-                this.changing=false;
+                this.changing = false;
             });
         },
         onClickNote(note) {

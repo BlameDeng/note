@@ -20,9 +20,7 @@
     export default {
         name: 'Article',
         data() {
-            return {
-                editing: true,
-            }
+            return { editing: true, saving: false }
         },
         computed: {
             ...mapState({
@@ -45,13 +43,21 @@
             ...mapActions(['createNote', 'patchNote']),
             ...mapMutations(['setCurrentNote']),
             onSaveNote() {
+                if (this.saving) { return }
+                this.saving = true;
                 this.patchNote({
                     noteId: this.note.id,
                     title: this.note.title,
                     content: this.note.content
                 }).then(res => {
-                    
-                })
+                    this.saving = false;
+                    this.$message({
+                        type: 'success',
+                        message: '保存成功!',
+                        duration: 1500
+                    });
+                });
+
             }
         }
     }

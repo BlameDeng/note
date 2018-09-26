@@ -18,7 +18,7 @@
                 <n-icon name="wenjianjia" class="icon"></n-icon>
                 <span>我的文件夹</span>
             </div>
-            <div class="book" v-for="(book,index) in allNotebooks" :key="index" v-if="allNotebooks&&allNotebooks.length&&!retractBooks" :class="{active:book===selectedBook}" @click="onClickBook($event,index,book)" @click.right="onClickBook($event,index,book)">
+            <div class="book" v-for="(book,index) in allNotebooks" :key="book.id" v-if="allNotebooks&&allNotebooks.length&&!retractBooks" :class="{active:selectedBook&&book.id===selectedBook.id}" @click="onClickBook($event,index,book)" @click.right="onClickBook($event,index,book)">
                 <template v-if="book!==renameBook">
                     <n-icon name="wenjian" class="icon"></n-icon>
                     <span>{{book.title}}</span>
