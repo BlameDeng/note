@@ -34,6 +34,7 @@ const actions = {
     },
     async createNotebooks({ commit }, { title }) {
         let res = await request({ url: url.createNotebooks, method: 'POST', data: { title } });
+        commit('addNotebooks',{notebook:res.data});
         return res;
     },
     async deleteNotebooks({ commit }, { notebookId }) {

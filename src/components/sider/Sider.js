@@ -52,7 +52,6 @@ export default {
             "deleteNoteConfirm"
         ]),
         ...mapMutations([
-            "addNotebooks",
             "filterNotebooks",
             "updateNotebooks",
             "setCurrentNote"
@@ -95,7 +94,7 @@ export default {
             this.showNewBook = false;
             this.createNotebooks({ title: this.newName }).then(res => {
                 this.newName = "新建文件夹";
-                this.addNotebooks({ notebook: res.data });
+                this.selectedBook=res.data;
                 this.creating = false;
             });
         },
