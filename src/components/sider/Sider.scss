@@ -15,7 +15,6 @@
         background: #eee;
         border-right: 1px solid $bcolor1;
         font-size: 12px;
-
         >.add {
             height: 60px;
             display: flex;
@@ -267,6 +266,7 @@
             }
         }
         >.widget {
+            // width: 100%;height: 100%;
             >.book {
                 cursor: pointer;
                 padding: 5px 0 5px 20px;
@@ -297,8 +297,13 @@
                         }
                     }
                 }
-                >p{white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-bottom: 5px;
-                color: $tcolor2;}
+                >p {
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    padding-bottom: 5px;
+                    color: $tcolor3;
+                }
                 >span {
                     padding-bottom: 10px;
                     color: $tcolor4;
@@ -340,8 +345,29 @@
                         }
                     }
                 }
-                &.batch-type{
-                    box-shadow:inset 0 0 2px #FF0000;
+                &.batch-type {
+                    box-shadow: inset 0 0 2px #FF0000;
+                }
+            }
+            >.no-note {
+                width: 100%;
+                // height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                padding-top: 300px;
+                >p {
+                    margin-bottom: 10px;
+                    color: $tcolor3;
+                }
+                >.el-btn {
+                    padding: 8px 20px;
+                    background: $tcolor;
+                    color: #fff;
+                    &:hover {
+                        background: #337ed5;
+                    }
                 }
             }
             >.batch {
@@ -362,7 +388,7 @@
                     padding: 5px 0 5px 0;
                     text-align: center;
                     >span {
-                        margin:0 5px;
+                        margin: 0 5px;
                         padding: 4px 10px;
                         border-radius: 15px;
                         background: #ddd;

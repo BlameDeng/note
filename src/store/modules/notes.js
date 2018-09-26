@@ -8,13 +8,6 @@ const state = {
 }
 
 const getters = {
-    // getNoteById: (state) => {
-    //     return (noteId) => {
-    //         if (state.notes && state.notes.length) {
-    //             return state.notes.find(note => note.id === noteId);
-    //         }
-    //     }
-    // }
 }
 
 const mutations = {
@@ -74,6 +67,7 @@ const actions = {
             method: 'DELETE'
         });
         commit('deleteNote', { noteId });
+        commit('setCurrentNote',null);
         return res;
     },
     async patchNote({ commit }, { noteId, title, content }) {

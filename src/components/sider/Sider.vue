@@ -50,6 +50,7 @@
                 <input type="text" placeholder="搜索...">
             </div>
             <div class="widget">
+                <!-- 展示文件夹列表 -->
                 <template v-if="selectedTab==='books'">
                     <div class="book" v-for="(book,index) in allNotebooks" :key="index" v-if="allNotebooks&&allNotebooks.length" @click="onClickBook($event, index, book)">
                         <div class="icon-wrapper">
@@ -60,6 +61,7 @@
                         <span>{{formatDate(book.createdAt)}}</span>
                     </div>
                 </template>
+                <!-- 展示选中的文件夹中的笔记 -->
                 <template v-if="selectedBook">
                     <div class="book" v-for="(note,index) in notes" :key="index" v-if="notes&&notes.length" @click="onClickNote(note)" :class="{active:currentNote&&currentNote.id===note.id}">
                         <div class="icon-wrapper">
@@ -70,7 +72,12 @@
                         <p>{{note.content}}</p>
                         <span>{{formatDate(note.createdAt)}}</span>
                     </div>
+                    <div class="no-note" v-if="notes&&notes.length===0">
+                        <p>没有找到文件</p>
+                        <el-button plain class="el-btn" @click="onAddNote">新建笔记</el-button>
+                    </div>
                 </template>
+                <!-- 展示回收站中的笔记 -->
                 <template v-else-if="selectedTab==='trash'">
                     <div class="batch" v-if="trashNotes&&trashNotes.length">
                         <div class="icon-wrapper">
