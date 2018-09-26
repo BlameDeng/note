@@ -1,6 +1,7 @@
 <template>
     <div class="file">
-        <n-header style="margin-top:-68px;"></n-header>
+        <n-header></n-header>
+        <!-- style="margin-top:-68px;" -->
         <div class="main">
             <n-sider></n-sider>
             <n-article></n-article>

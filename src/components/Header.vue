@@ -1,5 +1,5 @@
 <template>
-    <div class="header" :class="{login:isLogin}" @click="a=!a">
+    <div class="header" :class="{['header-login']:isLogin}" @click="a=!a">
         <div class="logo">
             <span class="pen">
                 <n-icon name="pen"></n-icon>
@@ -42,6 +42,8 @@
         background: $tcolor;
         color: #fff;
         padding: 54px 0;
+        flex-grow: 0;
+        flex-shrink: 0;
         min-width: 960px;
         >.logo {
             width: 960px;
@@ -65,7 +67,7 @@
                 vertical-align: middle;
             }
         }
-        &.login {
+        &.header-login {
             display: flex;
             justify-content: space-between;
             align-items: center;

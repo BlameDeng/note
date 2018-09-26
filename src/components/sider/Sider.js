@@ -18,7 +18,9 @@ export default {
             batchArr: [],
             showAllSelect: true,
             creating: false,
-            changing: false
+            changing: false,
+            move: false,
+            diff:''
         };
     },
     inject: ["eventBus"],
@@ -74,18 +76,73 @@ export default {
                 this.retractBooks = false;
             };
             if (tab === 'trash') {
-                this.getTrashNotes().then(res => {})
+                this.getTrashNotes().then(res => {
+                    let scrollWrapper = this.$refs.scrollWrapper;
+                    let scrollbar = this.$refs.scrollbar;
+                    let detail = this.$refs.detail;
+                    let slider = this.$refs.slider;
+                    let { height: detailHeight } = detail.getBoundingClientRect();
+                    scrollbar.style.height = `${detailHeight-133}px`;
+                    let style = this.$refs.scrollWrapper.getBoundingClientRect();
+                    let height = document.documentElement.clientHeight;
+                    let { bottom } = style;
+                    let hidden = bottom - height;
+                    let diff = hidden / 150;
+                    this.diff=diff;
+                    console.log(hidden)
+                });
             }
         },
-        listenAddPop() {
-            this.showAddPop = false;
+        scrollBarController(){
+
         },
-        listenBookPop() {
-            this.showBookPop = false;
+        mousedown(e) {
+            this.move = true;
+            let scrollWrapper = this.$refs.scrollWrapper;
+            // scroll.addEventListener('mousemove',(e)=>{
+            //     console.log(e);
+            // })
         },
+        mouseup(e) { this.move = false; },
+        mousewheel(e) {
+            let { deltaY: y } = e;
+            let slider = this.$refs.slider;
+            let n = (y / 100) * 25;
+
+
+            let scrollWrapper = this.$refs.scrollWrapper;
+            let style = this.$refs.scrollWrapper.getBoundingClientRect();
+            let height = document.documentElement.clientHeight;        
+            let { bottom } = style;
+            let hidden = bottom - height;
+            // let diff = hidden / 150;
+
+            if (slider.style.transform) {
+                let arr = slider.style.transform.match(/[\d]{1,3}/);
+                let m = parseInt(arr[0]);
+                if (m + n > 150 || m + n < 0) {
+                    return
+                }
+                slider.style.transform = `translateY(${m+n}%)`;
+                scrollWrapper.style.transform = `translateY(-${this.diff*(m+n)}px)`
+                return
+            }
+            if (n < 0) {
+                return
+            }
+            slider.style.transform = `translateY(${n}%)`;
+            scrollWrapper.style.transform = `translateY(-${this.diff*(n)}px)`
+        },
+        mousemove(e) {
+            if (!this.move) {
+                return
+            }
+            console.log(e)
+        },
+        listenAddPop() { this.showAddPop = false; },
+        listenBookPop() { this.showBookPop = false; },
         onClickAddBook() {
             this.showNewBook = true;
-            // this.selectedTab = 'books';
             this.retractBooks = false;
         },
         onAddNotebook() {
@@ -94,13 +151,15 @@ export default {
             this.showNewBook = false;
             this.createNotebooks({ title: this.newName }).then(res => {
                 this.newName = "新建文件夹";
-                this.selectedBook=res.data;
+                this.selectedBook = res.data;
+                this.selectedTab = '';
                 this.creating = false;
             });
         },
         onClickDeleteBook(book) {
             this.showBookPop = false;
             this.deleteNotebooks({ notebookId: book.id }).then(res => {
+                this.selectedBook = null;
                 this.$message({
                     type: 'info',
                     message: '该文件夹已删除',
@@ -273,7 +332,9 @@ export default {
             }
         }
     },
-    mounted() { this.$el.oncontextmenu = () => { return false; }; },
+    mounted() {
+        this.$el.oncontextmenu = () => { return false; };
+    },
     beforeDestroy() {
         document.removeEventListener("click", this.listenAddPop);
         document.removeEventListener("click", this.listenBookPop);
