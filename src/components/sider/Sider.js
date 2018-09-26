@@ -16,10 +16,24 @@ export default {
             retractBooks: true,
             batchType: false,
             batchArr: [],
-            showAllSelect: true
+            showAllSelect: true,
+            creating: false,
+            changing: false
         };
     },
     inject: ["eventBus"],
+    directives: {
+        select: {
+            inserted: function(el) {
+                el.select();
+            }
+        },
+        focus: {
+            inserted: function(el) {
+                el.focus();
+            }
+        }
+    },
     computed: {
         ...mapState({
             isLogin: state => state.auth.isLogin,
@@ -29,7 +43,6 @@ export default {
             currentNote: state => state.notes.currentNote
         })
     },
-    created() {},
     methods: {
         ...mapActions([
             "logout",
@@ -76,16 +89,19 @@ export default {
         listenBookPop() {
             this.showBookPop = false;
         },
-        onFocus(e) {
-            e.target.select();
+        onClickAddBook() {
+            this.showNewBook = true;
+            this.selectedTab = 'books';
+            this.retractBooks = false;
         },
         onAddNotebook() {
+            if (this.creating) { return }
+            this.creating = true;
             this.createNotebooks({ title: this.newName }).then(res => {
                 this.showNewBook = false;
-                this.selectedTab = 'books';
                 this.newName = "新建文件夹";
                 this.addNotebooks({ notebook: res.data });
-                this.retractBooks = false;
+                this.creating = false;
             });
         },
         onClickDeleteBook(book) {
@@ -117,6 +133,8 @@ export default {
             this.newBookTitle = book.title;
         },
         onRenameBook(book) {
+            if(this.changing){return}
+            this.changing=true;
             book.title = this.newBookTitle;
             this.renameNotebooks({
                 title: book.title,
@@ -124,6 +142,7 @@ export default {
             }).then(res => {
                 this.updateNotebooks({ notebook: book });
                 this.renameBook = null;
+                this.changing=false;
             });
         },
         onClickNote(note) {

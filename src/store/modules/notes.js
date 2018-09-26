@@ -8,13 +8,13 @@ const state = {
 }
 
 const getters = {
-    getNoteById: (state) => {
-        return (noteId) => {
-            if (state.notes && state.notes.length) {
-                return state.notes.find(note => note.id === noteId);
-            }
-        }
-    }
+    // getNoteById: (state) => {
+    //     return (noteId) => {
+    //         if (state.notes && state.notes.length) {
+    //             return state.notes.find(note => note.id === noteId);
+    //         }
+    //     }
+    // }
 }
 
 const mutations = {

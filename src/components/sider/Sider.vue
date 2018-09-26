@@ -6,7 +6,7 @@
                 <span @click="showAddPop = true">新建文档</span>
                 <div class="popover" v-show="showAddPop">
                     <p ref="note" @click="onAddNote">新建笔记</p>
-                    <p ref="notebook" @click="showNewBook = true">新建文件夹</p>
+                    <p ref="notebook" @click="onClickAddBook">新建文件夹</p>
                 </div>
             </div>
             <div class="recent" :class="{active:selectedTab==='recent'}" @click="onClickTab($event,'recent')">
@@ -18,7 +18,7 @@
                 <n-icon name="wenjianjia" class="icon"></n-icon>
                 <span>我的文件夹</span>
             </div>
-            <div class="book" v-for="(book,index) in allNotebooks" :key="book.id" v-if="allNotebooks&&allNotebooks.length&&!retractBooks" :class="{active:book===selectedBook}" @click="onClickBook($event,index,book)" @click.right="onClickBook($event,index,book)">
+            <div class="book" v-for="(book,index) in allNotebooks" :key="index" v-if="allNotebooks&&allNotebooks.length&&!retractBooks" :class="{active:book===selectedBook}" @click="onClickBook($event,index,book)" @click.right="onClickBook($event,index,book)">
                 <template v-if="book!==renameBook">
                     <n-icon name="wenjian" class="icon"></n-icon>
                     <span>{{book.title}}</span>
@@ -31,12 +31,12 @@
                 </template>
                 <template v-else>
                     <n-icon name="wenjian" class="icon"></n-icon>
-                    <input type="text" v-model="newBookTitle" autofocus="autofocus" @focus="onFocus($event)" @blur="onRenameBook(book)" @keyup.enter="onRenameBook(book)">
+                    <input type="text" v-model="newBookTitle" v-select @blur="onRenameBook(book)">
                 </template>
             </div>
-            <div class="book" v-show="showNewBook">
+            <div class="book" v-if="showNewBook">
                 <n-icon name="wenjian" class="icon"></n-icon>
-                <input type="text" v-model="newName" @blur="onAddNotebook" ref="newName" autofocus="autofocus" @focus="onFocus($event)">
+                <input type="text" v-model="newName" @blur="onAddNotebook" v-select>
             </div>
             <div class="trash" :class="{active:selectedTab==='trash'}" @click="onClickTab($event,'trash')">
                 <n-icon name="trash" class="icon"></n-icon>
