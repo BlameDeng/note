@@ -20,7 +20,7 @@ export default {
             creating: false,
             changing: false,
             move: false,
-            diff:''
+            perHide: ''
         };
     },
     inject: ["eventBus"],
@@ -77,24 +77,23 @@ export default {
             };
             if (tab === 'trash') {
                 this.getTrashNotes().then(res => {
-                    let scrollWrapper = this.$refs.scrollWrapper;
-                    let scrollbar = this.$refs.scrollbar;
-                    let detail = this.$refs.detail;
-                    let slider = this.$refs.slider;
-                    let { height: detailHeight } = detail.getBoundingClientRect();
-                    scrollbar.style.height = `${detailHeight-133}px`;
-                    let style = this.$refs.scrollWrapper.getBoundingClientRect();
-                    let height = document.documentElement.clientHeight;
-                    let { bottom } = style;
-                    let hidden = bottom - height;
-                    let diff = hidden / 150;
-                    this.diff=diff;
-                    console.log(hidden)
+                    this.scrollBarController();
                 });
             }
         },
-        scrollBarController(){
-
+        scrollBarController() {
+            //给滚动条高度
+            let scrollWrapper = this.$refs.scrollWrapper; //要滚动的元素
+            let scrollbar = this.$refs.scrollbar; //滚动条 定位用 没有高度 要给它高度
+            let detail = this.$refs.detail; //顶层父元素 定位用
+            let { height: detailHeight } = detail.getBoundingClientRect(); //父元素高度，做原始定位偏移用
+            scrollbar.style.height = `${detailHeight-133}px`;
+            //算出隐藏的高度，算出每次滚动对应的距离
+            let height = document.documentElement.clientHeight; //视口高度
+            let { bottom } = scrollWrapper.getBoundingClientRect();
+            let hidden = bottom - height; //隐藏的高度
+            let perHide = hidden / 150; //滑块每滚动1%自身高度，需要调整对应要滚动元素的高度
+            this.perHide = perHide;
         },
         mousedown(e) {
             this.move = true;
@@ -105,33 +104,26 @@ export default {
         },
         mouseup(e) { this.move = false; },
         mousewheel(e) {
-            let { deltaY: y } = e;
-            let slider = this.$refs.slider;
-            let n = (y / 100) * 25;
+            let { deltaY: y } = e; //y为滚轮滚动距离
+            let slider = this.$refs.slider; //滑动条
+            let n = y / 4; //y的值每次是100 取小一点 看鼠标灵敏度
 
+            let scrollWrapper = this.$refs.scrollWrapper; //要滚动的元素
 
-            let scrollWrapper = this.$refs.scrollWrapper;
-            let style = this.$refs.scrollWrapper.getBoundingClientRect();
-            let height = document.documentElement.clientHeight;        
-            let { bottom } = style;
-            let hidden = bottom - height;
-            // let diff = hidden / 150;
-
-            if (slider.style.transform) {
-                let arr = slider.style.transform.match(/[\d]{1,3}/);
-                let m = parseInt(arr[0]);
-                if (m + n > 150 || m + n < 0) {
+            if (slider.style.transform) { //没滚动时不存在 保护性
+                let arr = slider.style.transform.match(/[\d]{1,3}/); //正则拿到当前的偏移量 注意以后是每次累加
+                let m = parseInt(arr[0]); //m是当前偏移量
+                if (m + n > 150 || m + n < 0) { //滑动条的偏移在0%到150%之间
                     return
                 }
-                slider.style.transform = `translateY(${m+n}%)`;
-                scrollWrapper.style.transform = `translateY(-${this.diff*(m+n)}px)`
+                slider.style.transform = `translateY(${m+n}%)`; //设置滑动条的偏移
+                scrollWrapper.style.transform = `translateY(-${this.perHide*(m+n)}px)`; //设置滚动元素的偏移 向上的
                 return
-            }
-            if (n < 0) {
+            } else if (n < 0) { //原始没偏移 n<0表示一开始滑动条在上滑
                 return
             }
             slider.style.transform = `translateY(${n}%)`;
-            scrollWrapper.style.transform = `translateY(-${this.diff*(n)}px)`
+            scrollWrapper.style.transform = `translateY(-${this.perHide*(n)}px)`;  //初始状态，且滑动条下滑
         },
         mousemove(e) {
             if (!this.move) {
