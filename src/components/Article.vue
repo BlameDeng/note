@@ -4,16 +4,18 @@
             <template v-if="editing&&note">
                 <input type="text" v-model.trim="note.title" ref="input">
                 <div class="btn-wrapper">
-                    <el-button plain class="el-btn" @click="onSaveNote" v-show="!preview">保存</el-button>
-                    <el-button plain class="el-btn" @click="onClosePreview" v-show="preview">编辑</el-button>
+                    <el-button plain class="el-btn" @click="onSaveNote">保存</el-button>
                     <el-button plain class="el-btn" @click="onPreview" :class="{[`preview-btn`]:preview}">Markdown 预览</el-button>
                 </div>
             </template>
         </div>
-        <div class="tool-bar"></div>
+        <div class="tool-bar">
+            <span>字体大小</span>
+            <el-input-number v-model="fontSize" :min="12" :max="40" size="small" :controls="false" style="width:60px;"></el-input-number>
+        </div>
         <div class="context">
             <template v-if="editing&&note">
-                <textarea v-model="note.content" ref="textarea" v-show="!preview"></textarea>
+                <textarea v-model="note.content" ref="textarea" v-show="!preview" :style="{['font-size']:`${fontSize}px`}"></textarea>
                 <div class="preview" v-show="preview" v-html="markdown"></div>
             </template>
         </div>
@@ -25,7 +27,12 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   name: "Article",
   data() {
-    return { editing: true, saving: false, preview: false };
+    return {
+      editing: true,
+      saving: false,
+      preview: false,
+      fontSize: 14
+    };
   },
   computed: {
     ...mapState({
@@ -72,12 +79,11 @@ export default {
       });
     },
     onPreview() {
-      this.preview = true;
+      this.preview = !this.preview;
     },
-    onClosePreview() {
-      this.preview = false;
-      this.$refs.input.select();
-    }
+  },
+  beforeDestroy() {
+    this.eventBus.$off("click-add-note");
   }
 };
 </script>
@@ -91,7 +97,7 @@ export default {
     flex-grow: 1;
     border-bottom: 1px solid $bcolor1;
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-between;
     align-items: center;
     > input {
       border: none;
@@ -102,10 +108,12 @@ export default {
       }
     }
     > .btn-wrapper {
-      margin-left: auto;
-      padding-right: 100px;
+      margin-right: 80px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
       > .el-btn {
-        padding: 8px 20px;
+        padding: 8px 10px;
         &.preview-btn {
           background: $tcolor;
           color: #fff;
@@ -114,8 +122,10 @@ export default {
     }
   }
   > .tool-bar {
-    height: 30px;
+    padding: 2px 0 2px 20px;
     border-bottom: 1px solid $bcolor2;
+    color: $tcolor3;
+    font-size: 12px;
   }
   > .context {
     > textarea {
