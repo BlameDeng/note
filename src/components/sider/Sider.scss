@@ -350,7 +350,7 @@
                     box-shadow: inset 0 0 2px #FF0000;
                 }
             }
-            >.no-note {
+            .no-note {
                 width: 100%;
                 // height: 100%;
                 display: flex;
@@ -378,6 +378,7 @@
                 position: relative;
                 z-index: 1;
                 background: #fff;
+                height: 100%;
                 >.icon-wrapper {
                     display: flex;
                     justify-content: flex-start;
@@ -412,20 +413,6 @@
                             }
                         }
                     }
-                }
-            }
-        }
-        >.scrollbar {
-            position: absolute;
-            right: 0;
-            top: 133px;
-            width: 15px;
-            >.slider-wrapper{
-                width: 100%;height: 100%;background: #666;position: relative;
-                >.slider{
-                    width: 100%;height: 40%;background:$tcolor;
-                    transform: translateY(0);
-                    transition: all .3s;
                 }
             }
         }

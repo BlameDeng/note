@@ -1,8 +1,9 @@
 import Icon from "../icon.vue"
+import Scrollbar from "../scrollbar.vue"
 import { mapState, mapActions, mapMutations } from "vuex"
 export default {
     name: "Sider",
-    components: { "n-icon": Icon },
+    components: { "n-icon": Icon, 'n-scrollbar': Scrollbar },
     data() {
         return {
             showAddPop: false,
@@ -40,6 +41,7 @@ export default {
             currentNote: state => state.notes.currentNote
         })
     },
+    created() {},
     methods: {
         ...mapActions([
             "logout",
@@ -77,59 +79,9 @@ export default {
             };
             if (tab === 'trash') {
                 this.getTrashNotes().then(res => {
-                    this.scrollBarController();
+                    this.eventBus.$emit('get-trashnotes-done');
                 });
             }
-        },
-        scrollBarController() {
-            //给滚动条高度
-            let scrollWrapper = this.$refs.scrollWrapper; //要滚动的元素
-            let scrollbar = this.$refs.scrollbar; //滚动条 定位用 没有高度 要给它高度
-            let detail = this.$refs.detail; //顶层父元素 定位用
-            let { height: detailHeight } = detail.getBoundingClientRect(); //父元素高度，做原始定位偏移用
-            scrollbar.style.height = `${detailHeight-133}px`;
-            //算出隐藏的高度，算出每次滚动对应的距离
-            let height = document.documentElement.clientHeight; //视口高度
-            let { bottom } = scrollWrapper.getBoundingClientRect();
-            let hidden = bottom - height; //隐藏的高度
-            let perHide = hidden / 150; //滑块每滚动1%自身高度，需要调整对应要滚动元素的高度
-            this.perHide = perHide;
-        },
-        mousedown(e) {
-            this.move = true;
-            let scrollWrapper = this.$refs.scrollWrapper;
-            // scroll.addEventListener('mousemove',(e)=>{
-            //     console.log(e);
-            // })
-        },
-        mouseup(e) { this.move = false; },
-        mousewheel(e) {
-            let { deltaY: y } = e; //y为滚轮滚动距离
-            let slider = this.$refs.slider; //滑动条
-            let n = y / 4; //y的值每次是100 取小一点 看鼠标灵敏度
-
-            let scrollWrapper = this.$refs.scrollWrapper; //要滚动的元素
-
-            if (slider.style.transform) { //没滚动时不存在 保护性
-                let arr = slider.style.transform.match(/[\d]{1,3}/); //正则拿到当前的偏移量 注意以后是每次累加
-                let m = parseInt(arr[0]); //m是当前偏移量
-                if (m + n > 150 || m + n < 0) { //滑动条的偏移在0%到150%之间
-                    return
-                }
-                slider.style.transform = `translateY(${m+n}%)`; //设置滑动条的偏移
-                scrollWrapper.style.transform = `translateY(-${this.perHide*(m+n)}px)`; //设置滚动元素的偏移 向上的
-                return
-            } else if (n < 0) { //原始没偏移 n<0表示一开始滑动条在上滑
-                return
-            }
-            slider.style.transform = `translateY(${n}%)`;
-            scrollWrapper.style.transform = `translateY(-${this.perHide*(n)}px)`;  //初始状态，且滑动条下滑
-        },
-        mousemove(e) {
-            if (!this.move) {
-                return
-            }
-            console.log(e)
         },
         listenAddPop() { this.showAddPop = false; },
         listenBookPop() { this.showBookPop = false; },
@@ -321,6 +273,9 @@ export default {
                 this.batchType = false;
                 this.batchArr = [];
                 this.showAllSelect = true;
+            }
+            if(val==='books'){
+                this.eventBus.$emit('select-books');
             }
         }
     },
