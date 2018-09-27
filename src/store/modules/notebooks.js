@@ -2,48 +2,56 @@ import url from '@/api/url.js'
 import request from '@/helpers/request.js'
 
 const state = {
-    allNotebooks: null
+    currentTab: '',
+    allBooks: null,
+    currentBook: null
 }
 
 const getters = {}
 
 const mutations = {
-    setAllNotebooks(state, payload) {
-        state.allNotebooks = payload.allNotebooks;
+    setAllBooks(state, payload) {
+        state.allBooks = payload.allBooks;
     },
-    addNotebooks(state, payload) {
-        state.allNotebooks.push(payload.notebook);
+    setCurrentTab(state, payload) {
+        state.currentTab = payload;
     },
-    filterNotebooks(state, payload) {
-        state.allNotebooks = state.allNotebooks.filter((notebook) => notebook.id !== payload.id);
+    setCurrentBook(state, payload) {
+        state.currentBook = payload.book;
     },
-    updateNotebooks(state, payload) {
-        state.allNotebooks.map(notebook => {
-            if (notebook.id === payload.notebook.id) {
-                notebook.title = payload.notebook.title;
+    addBook(state, payload) {
+        state.allBooks.push(payload.book);
+    },
+    filterBook(state, payload) {
+        state.allBooks = state.allBooks.filter((book) => book.id !== payload.id);
+    },
+    updateBook(state, payload) {
+        state.allBooks.map(book => {
+            if (book.id === payload.book.id) {
+                book.title = payload.book.title;
             }
         })
     }
 }
 
 const actions = {
-    async getNotebooks({ commit }) {
+    async getBooks({ commit }) {
         let res = await request({ url: url.getNotebooks });
-        commit('setAllNotebooks', { allNotebooks: res.data });
+        commit('setAllBooks', { allBooks: res.data });
         return res;
     },
-    async createNotebooks({ commit }, { title }) {
+    async createBook({ commit }, { title }) {
         let res = await request({ url: url.createNotebooks, method: 'POST', data: { title } });
-        commit('addNotebooks',{notebook:res.data});
+        commit('addBook', { book: res.data });
         return res;
     },
-    async deleteNotebooks({ commit }, { notebookId }) {
-        let res = await request({ url: url.deleteNotebooks.replace(':notebookId', notebookId), method: 'DELETE' });
+    async deleteBook({ commit }, { bookId }) {
+        let res = await request({ url: url.deleteNotebooks.replace(':notebookId', bookId), method: 'DELETE' });
         return res;
     },
-    async renameNotebooks({ commit }, { title, notebookId }) {
+    async renameBook({ commit }, { title, bookId }) {
         let res = await request({
-            url: url.renameNotebooks.replace(':notebookId', notebookId),
+            url: url.renameBook.replace(':notebookId', bookId),
             method: 'PATCH',
             data: { title }
         });

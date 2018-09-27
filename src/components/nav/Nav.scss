@@ -1,0 +1,225 @@
+@import '@/assets/base.scss';
+.nav {
+    width: 250px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    background: #eee;
+    border-right: 1px solid $bcolor1;
+    font-size: 12px;
+    // 新建文档
+    >.add {
+        height: 60px;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding-left: 40px;
+        border-bottom: 1px solid $bcolor1;
+        position: relative;
+        >.icon {
+            fill: $tcolor;
+        }
+        >span {
+            cursor: pointer;
+            margin-left: 15px;
+            position: relative;
+            &::after {
+                content: '';
+                display: inline-block;
+                width: 4px;
+                height: 4px;
+                border: 4px solid transparent;
+                border-top-color: #999;
+                position: absolute;
+                top: 0;
+                right: 0;
+                transform: translateY(7px) translateX(15px);
+            }
+            &:hover {
+                color: $tcolor;
+            }
+        }
+        // 新建文档弹框
+        >.add-pop {
+            position: absolute;
+            top: 50px;
+            left: 40px;
+            background: #fff;
+            color: $tcolor3;
+            cursor: pointer;
+            border-radius: 4px;
+            box-shadow: 0 1px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            >p {
+                padding: 10px 30px 10px 25px;
+                &:first-child {
+                    border-top-left-radius: 4px;
+                    border-top-right-radius: 4px;
+                }
+                &:last-child {
+                    border-bottom-left-radius: 4px;
+                    border-bottom-right-radius: 4px;
+                }
+                &:hover {
+                    background: $hcolor2;
+                }
+            }
+        }
+    }
+    >.recent {
+        height: 40px;
+        cursor: pointer;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding-left: 40px;
+        border-top: 1px solid #fff;
+        >span {
+            margin-left: 15px;
+        }
+        &:hover {
+            background: $hcolor1;
+            border-top: none;
+        }
+        &.active {
+            background: $tcolor;
+            color: #fff;
+            border-top: none;
+        }
+    }
+    >.books {
+        height: 40px;
+        cursor: pointer;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding-left: 40px;
+        position: relative;
+        >p {
+            width: 5px;
+            height: 5px;
+            border: 5px solid transparent;
+            border-top-color: $tcolor3;
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-4px) translateX(25px) rotateZ(-90deg);
+            &.active {
+                transform: translateY(-1px) translateX(20px);
+            }
+        }
+        >span {
+            margin-left: 15px;
+        }
+        &:hover {
+            background: $hcolor1;
+        }
+        &.active {
+            background: $tcolor;
+            color: #fff;
+            >p {
+                border-top-color: #fff;
+            }
+        }
+    }
+    .book {
+        height: 40px;
+        cursor: pointer;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding-left: 60px;
+        position: relative;
+        >span {
+            margin-left: 15px;
+        }
+        input {
+            width: 150px;
+            margin-left: 10px;
+            padding: 4px 0 4px 5px;
+        }
+        >p {
+            width: 5px;
+            height: 5px;
+            border: 5px solid transparent;
+            position: absolute;
+            top: 0;
+            right: 0;
+            transform: translateY(18px) translateX(-25px);
+        }
+        &:hover {
+            background: $hcolor1;
+            >p {
+                border-top-color: #666;
+            }
+        }
+        &.active {
+            background: $tcolor;
+            color: #fff;
+            &:hover {
+                >p {
+                    border-top-color: #fff;
+                }
+            }
+        }
+        >.book-pop {
+            position: fixed;
+            background: #fff;
+            color: $tcolor3;
+            cursor: pointer;
+            border-radius: 4px;
+            box-shadow: 0 1px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            >p {
+                white-space: nowrap;
+                padding: 10px 30px 10px 25px;
+                &:first-child {
+                    border-top-left-radius: 4px;
+                    border-top-right-radius: 4px;
+                }
+                &:last-child {
+                    border-bottom-left-radius: 4px;
+                    border-bottom-right-radius: 4px;
+                }
+                &:hover {
+                    background: $hcolor2;
+                }
+            }
+        }
+    }
+    >.trash {
+        height: 40px;
+        cursor: pointer;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding-left: 40px;
+        position: relative;
+        >span {
+            margin-left: 15px;
+        }
+        >p {
+            width: 5px;
+            height: 5px;
+            border: 5px solid transparent;
+            position: absolute;
+            top: 0;
+            right: 0;
+            transform: translateY(18px) translateX(-25px);
+        }
+        &:hover {
+            background: $hcolor1;
+            >p {
+                border-top-color: #666;
+            }
+        }
+        &.active {
+            background: $tcolor;
+            color: #fff;
+            &:hover {
+                >p {
+                    border-top-color: #fff;
+                }
+            }
+        }
+    }
+}

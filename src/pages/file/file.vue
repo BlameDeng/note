@@ -3,14 +3,14 @@
         <n-header></n-header>
         <!-- style="margin-top:-68px;" -->
         <div class="main">
-            <n-sider></n-sider>
+            <n-nav></n-nav>
             <n-article></n-article>
         </div>
     </div>
 </template>
 <script>
     import Header from "@/components/Header.vue"
-    import Sider from "@/components/sider/Sider.vue"
+    import Nav from "@/components/nav/Nav.vue"
     import Article from '@/components/Article.vue'
     import { mapActions, mapState } from "vuex"
     import Vue from 'vue'
@@ -18,7 +18,7 @@
         name: "File",
         components: {
             "n-header": Header,
-            'n-sider': Sider,
+            'n-nav': Nav,
             'n-article': Article
         },
         data() {
@@ -28,23 +28,23 @@
             return { eventBus: this.eventBus };
         },
         computed: {
-            ...mapState({
-                allNotebooks: state => state.notebooks.allNotebooks
-            })
+            // ...mapState({
+            //     allNotebooks: state => state.notebooks.allNotebooks
+            // })
         },
         created() {
-            this.getNotebooks().then(res => {}).catch(() => {});
+            // this.getNotebooks().then(res => {}).catch(() => {});
         },
         methods: {
-            ...mapActions(['getNotebooks', 'createNotebooks', 'logout']),
-            onClick() {
-                this.createNotebooks({ title: '我的笔记本' }).then(res => {
+            // ...mapActions(['getNotebooks', 'createNotebooks', 'logout']),
+            // onClick() {
+            //     this.createNotebooks({ title: '我的笔记本' }).then(res => {
 
-                }).catch(() => {});
-            },
-            onClick1() {
-                this.logout();
-            }
+            //     }).catch(() => {});
+            // },
+            // onClick1() {
+            //     this.logout();
+            // }
         }
     };
 </script>
