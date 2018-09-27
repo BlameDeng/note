@@ -1,7 +1,7 @@
 <template>
     <div class="x-scrollbar-container" @mousewheel="mousewheel" @mouseup="mouseup" @mouseleave="mouseleave">
         <slot></slot>
-        <div class="scrollbar-position" v-if="overHeight">
+        <div class="scrollbar-position" v-if="overHeight>0">
             <div class="scroll-slider" ref="slider" @mousedown="sliderMousedown" :style="slider"></div>
         </div>
     </div>
@@ -15,7 +15,8 @@
                 default () {
                     return { background: "#ddd" };
                 }
-            }
+            },
+            height: ''
         },
         data() {
             return { overHeight: 0, originY: 0 };
@@ -24,7 +25,8 @@
         computed: {},
         created() {
             this.eventBus.$on('get-trashnotes-done', this.reSize);
-            this.eventBus.$on('select-books', this.reSize);
+            this.eventBus.$on('select-tab-books', this.reSize);
+            this.eventBus.$on('select-book', this.reSize);
         },
         methods: {
             scroll(y) {
@@ -55,7 +57,7 @@
                 }
             },
             mousewheel(e) {
-                if (!this.overHeight) {
+                if (this.overHeight <= 0) {
                     return;
                 }
                 let { deltaY: y } = e;
@@ -71,9 +73,7 @@
             mousemove(e) {
                 let { clientY: y } = e;
                 let moveY = y - this.originY;
-                if (Math.abs(moveY) < 5) {
-                    return;
-                }
+                if (Math.abs(moveY) < 5) { return }
                 this.scroll(moveY);
                 this.originY = y;
             },
@@ -86,30 +86,29 @@
             reSize() {
                 let clientHeight = document.documentElement.clientHeight;
                 let { y } = this.$el.getBoundingClientRect();
-                this.$el.style.height = clientHeight - y + "px";
+                this.$el.style.height = this.height || (clientHeight - y + "px");
                 let slot = this.$slots.default[0].elm;
                 this.$nextTick(() => {
                     let { height: slotHeight } = slot.getBoundingClientRect();
                     let { height: containerHeight } = this.$el.getBoundingClientRect();
-                    this.overHeight = slotHeight - containerHeight;
-                    if (this.overHeight <= 0) {
-                        return;
+                    if (this.height) {
+                        this.overHeight = slotHeight - (+this.height.match(/\d+/)[0]);
+                    } else {
+                        this.overHeight = slotHeight - containerHeight;
                     }
-                    console.log(this.overHeight)
+                    if (this.overHeight <= 0) { return }
                     slot.style.transition = "transform .5s";
-                    this.$el.onselectstart = function() {
-                        return false;
-                    };
                 })
             }
         },
         mounted() {
+            this.$el.onselectstart = () => false;
             this.reSize();
         },
         beforeDestroy() {
             this.eventBus.$off('get-trashnotes-done', this.reSize);
             this.eventBus.$off('select-books', this.reSize);
-            console.log('scrollbar')
+            this.eventBus.$off('select-book', this.reSize);
         }
     };
 </script>
@@ -127,9 +126,15 @@
             height: 100%;
             background: transparent;
             >.scroll-slider {
+                display: none;
                 width: 100%;
                 height: 40%;
                 transition: all 0.5s;
+            }
+        }
+        &:hover {
+            .scroll-slider {
+                display: block;
             }
         }
     }
