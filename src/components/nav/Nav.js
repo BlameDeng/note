@@ -2,7 +2,7 @@ import Icon from "../icon.vue";
 import Scrollbar from "../scrollbar.vue";
 import { mapState, mapActions, mapMutations } from "vuex";
 export default {
-    name: "Sider",
+    name: "Nav",
     components: { "n-icon": Icon, "n-scrollbar": Scrollbar },
     data() {
         return {
@@ -21,7 +21,7 @@ export default {
     computed: {
         ...mapState({
             currentTab: state => state.notebooks.currentTab,
-            allBooks: state => state.notebooks.allNotebooks,
+            allBooks: state => state.notebooks.allBooks,
             currentBook: state => state.notebooks.currentBook,
             notes: state => state.notes.notes,
             trashNotes: state => state.notes.trashNotes,
@@ -30,34 +30,37 @@ export default {
     },
     created() {},
     methods: {
-        ...mapActions([
-
-        ]),
-        ...mapMutations([]),
+        ...mapActions(['createNote', 'getBooks']),
+        ...mapMutations(['setCurrentTab']),
 
         onAddNote() {
             this.retract = false;
-            this.eventBus.$emit("add-note");
+            this.createNote()
         },
         onAddBook() {
             this.showNewBook = true;
             this.retractBooks = false;
         },
-        // onClickTab(e, tab) {
-        //   this.selectedTab = tab;
-        //   this.selectedBook = null;
-        //   if (tab !== "books") {
-        //     this.setCurrentNote(null);
-        //   }
-        //   if (tab === "books" && e.target !== this.$refs.booksTri) {
-        //     this.retractBooks = false;
-        //   }
-        //   if (tab === "trash") {
-        //     this.getTrashNotes().then(res => {
-        //       this.eventBus.$emit("get-trashnotes-done");
-        //     });
-        //   }
-        // },
+        onClickTab(e, tab) {
+            this.setCurrentTab(tab);
+            if (tab === 'books') {
+                this.getBooks().then(res => {
+                    this.retract=false;
+                }).catch(err => {});
+            }
+        },
+        onClickBook(e, index, book) {
+            this.showBookPop = false;
+            this.selectedTab = "";
+            let { clientX: x, clientY: y, which } = e;
+            this.selectedBook = book;
+            if (which === 1 && e.target.tagName !== "P") {
+                return;
+            } else {
+                this.notebookPop(x, y, index);
+                this.showBookPop = true;
+            }
+        },
         // listenAddPop() {
         //   this.showAddPop = false;
         // },
@@ -89,18 +92,6 @@ export default {
         //     });
         //     this.filterNotebooks({ id: book.id });
         //   });
-        // },
-        // onClickBook(e, index, book) {
-        //   this.showBookPop = false;
-        //   this.selectedTab = "";
-        //   let { clientX: x, clientY: y, which } = e;
-        //   this.selectedBook = book;
-        //   if (which === 1 && e.target.tagName !== "P") {
-        //     return;
-        //   } else {
-        //     this.notebookPop(x, y, index);
-        //     this.showBookPop = true;
-        //   }
         // },
         // notebookPop(x, y, index) {
         //   let pop = this.$refs[`bookPop${index}`][0];

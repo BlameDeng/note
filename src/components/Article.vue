@@ -1,8 +1,8 @@
 <template>
     <div class="article">
         <div class="title-bar">
-            <div class="inner-wrapper" v-show="note">
-                <input type="text" v-model.trim="note.title" ref="input" v-if="note">
+            <div class="inner-wrapper" v-show="currentNote">
+                <input type="text" v-model.trim="currentNote.title" ref="input" v-if="currentNote">
                 <div class="btn-wrapper">
                     <el-button plain class="el-btn" @click="onSaveNote">保存</el-button>
                     <el-button plain class="el-btn" @click="onPreview" :class="{[`preview-btn`]:preview}">Markdown 预览</el-button>
@@ -10,7 +10,7 @@
             </div>
         </div>
         <div class="tool-bar">
-            <div class="inner-wrapper" v-show="note">
+            <div class="inner-wrapper" v-show="currentNote">
                 <span>字体大小</span>
                 <el-select v-model="fontSize" size="mini" style="width:65px;">
                     <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
@@ -19,8 +19,8 @@
             </div>
         </div>
         <div class="context">
-            <div class="inner-wrapper" v-show="note">
-                <textarea v-model="note.content" ref="textarea" v-show="!preview" :style="{['font-size']:`${fontSize}px`}" v-if="note"></textarea>
+            <div class="inner-wrapper" v-show="currentNote">
+                <textarea v-model="currentNote.content" ref="textarea" v-show="!preview" :style="{['font-size']:`${fontSize}px`}" v-if="currentNote"></textarea>
                 <div class="preview" v-show="preview" v-html="markdown"></div>
             </div>
         </div>
@@ -56,28 +56,28 @@
         },
         computed: {
             ...mapState({
-                note: state => state.notes.currentNote
+                currentNote: state => state.notes.currentNote
             }),
             markdown() {
-                if (this.note) {
-                    return marked(this.note.content);
+                if (this.currentNote) {
+                    return marked(this.currentNote.content);
                 }
             }
         },
         inject: ["eventBus"],
-        created() {
-            this.eventBus.$on("click-add-note", book => {
-                this.createNote({
-                        notebookId: book.id,
-                        title: `无标题笔记 ${this.formatDate(new Date())}`,
-                        content: ""
-                    })
-                    .then(res => {
-                        this.$refs.input.select();
-                    })
-                    .catch(err => {});
-            });
-        },
+        // created() {
+        //     this.eventBus.$on("click-add-note", book => {
+        //         this.createNote({
+        //                 notebookId: book.id,
+        //                 title: `无标题笔记 ${this.formatDate(new Date())}`,
+        //                 content: ""
+        //             })
+        //             .then(res => {
+        //                 this.$refs.input.select();
+        //             })
+        //             .catch(err => {});
+        //     });
+        // },
         methods: {
             ...mapActions(["createNote", "patchNote"]),
             onSaveNote() {

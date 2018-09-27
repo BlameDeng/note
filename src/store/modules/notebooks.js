@@ -49,7 +49,7 @@ const actions = {
         let res = await request({ url: url.deleteNotebooks.replace(':notebookId', bookId), method: 'DELETE' });
         return res;
     },
-    async renameBook({ commit }, { title, bookId }) {
+    async patchBook({ commit }, { title, bookId }) {
         let res = await request({
             url: url.renameBook.replace(':notebookId', bookId),
             method: 'PATCH',
