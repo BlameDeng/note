@@ -32,9 +32,9 @@ export default {
         })
     },
     created() {
-        this.getBooks().then(res => {
-            this.eventBus.$emit('scrollbar-resize');
-        })
+        // this.getBooks().then(res => {
+        //     this.eventBus.$emit('scrollbar-resize');
+        // })
     },
     methods: {
         ...mapActions(['createNote', 'getBooks']),

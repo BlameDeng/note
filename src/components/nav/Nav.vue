@@ -22,10 +22,9 @@
             <span>我的文件夹</span>
         </div>
         <!-- 展示文件夹列表  -->
-        <n-scrollbar height="300px" v-if="allBooks&&allBooks.length" v-show="currentTab==='books'&&!retract">
+        <n-scrollbar height="300px" v-show="currentTab==='books'&&!retract">
             <div>
-                <div class="book" v-for="(book,index) in allBooks" :key="book.id" :class="{active:book===currentBook}" 
-                @click="onClickBook($event,book)" @click.right="onClickBook($event,book)">
+                <div class="book" v-for="(book,index) in allBooks" :key="book.id" :class="{active:book===currentBook}" @click="onClickBook($event,book)" @click.right="onClickBook($event,book)">
                     <template v-if="true">
                         <n-icon name="wenjian" class="icon"></n-icon>
                         <span>{{book.title}}</span>
@@ -52,7 +51,6 @@
                 </div>
             </div>
         </n-scrollbar>
-
         <div class="trash" :class="{active:currentTab==='trash'}" @click="onClickTab($event,'trash')">
             <n-icon name="trash" class="icon"></n-icon>
             <span>回收站</span>
