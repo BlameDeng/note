@@ -36,6 +36,9 @@
             }
             &:hover {
                 color: $tcolor;
+                &::after {
+                    border-top-color: $tcolor;
+                }
             }
         }
         // 新建文档弹框
@@ -81,7 +84,7 @@
             border-top: none;
         }
         &.active {
-            background: $tcolor;
+            background: $acolor1;
             color: #fff;
             border-top: none;
         }
@@ -94,17 +97,22 @@
         align-items: center;
         padding-left: 40px;
         position: relative;
-        >p {
-            width: 5px;
-            height: 5px;
-            border: 5px solid transparent;
-            border-top-color: $tcolor3;
+        >.retract-wrapper {
+            width: 20px;
             position: absolute;
             top: 50%;
-            left: 0;
-            transform: translateY(-4px) translateX(25px) rotateZ(-90deg);
-            &.active {
-                transform: translateY(-1px) translateX(20px);
+            left: 20px;
+            transform: translateY(-50%);
+            display: flex;
+            justify-content: center;
+            align-self: center;
+            font-size: 12px;
+            color: $tcolor3;
+            >.retract {
+                transition: all .3s;
+                &.active {
+                    transform: rotateZ(90deg);
+                }
             }
         }
         >span {
@@ -114,10 +122,10 @@
             background: $hcolor1;
         }
         &.active {
-            background: $tcolor;
+            background: $acolor1;
             color: #fff;
-            >p {
-                border-top-color: #fff;
+            >.retract-wrapper {
+                color: #fff;
             }
         }
     }
@@ -138,51 +146,52 @@
             padding: 4px 0 4px 5px;
         }
         >p {
-            width: 5px;
-            height: 5px;
-            border: 5px solid transparent;
             position: absolute;
-            top: 0;
-            right: 0;
-            transform: translateY(18px) translateX(-25px);
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%) rotateZ(90deg);
+            color: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         &:hover {
             background: $hcolor1;
             >p {
-                border-top-color: #666;
+                color: $tcolor3;
             }
         }
         &.active {
-            background: $tcolor;
+            background: $acolor1;
             color: #fff;
             &:hover {
                 >p {
-                    border-top-color: #fff;
+                    color: #fff;
                 }
             }
         }
-        >.book-pop {
-            position: fixed;
-            background: #fff;
-            color: $tcolor3;
-            cursor: pointer;
-            border-radius: 4px;
-            box-shadow: 0 1px 8px rgba(0, 0, 0, 0.2);
-            z-index: 1;
-            >p {
-                white-space: nowrap;
-                padding: 10px 30px 10px 25px;
-                &:first-child {
-                    border-top-left-radius: 4px;
-                    border-top-right-radius: 4px;
-                }
-                &:last-child {
-                    border-bottom-left-radius: 4px;
-                    border-bottom-right-radius: 4px;
-                }
-                &:hover {
-                    background: $hcolor2;
-                }
+    }
+    .book-pop {
+        position: fixed;
+        background: #fff;
+        color: $tcolor3;
+        cursor: pointer;
+        border-radius: 4px;
+        box-shadow: 0 1px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        >p {
+            white-space: nowrap;
+            padding: 10px 30px 10px 25px;
+            &:first-child {
+                border-top-left-radius: 4px;
+                border-top-right-radius: 4px;
+            }
+            &:last-child {
+                border-bottom-left-radius: 4px;
+                border-bottom-right-radius: 4px;
+            }
+            &:hover {
+                background: $hcolor2;
             }
         }
     }
@@ -213,7 +222,7 @@
             }
         }
         &.active {
-            background: $tcolor;
+            background: $acolor1;
             color: #fff;
             &:hover {
                 >p {

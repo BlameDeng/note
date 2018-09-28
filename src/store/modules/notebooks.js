@@ -17,7 +17,7 @@ const mutations = {
         state.currentTab = payload;
     },
     setCurrentBook(state, payload) {
-        state.currentBook = payload.book;
+        state.currentBook = payload;
     },
     addBook(state, payload) {
         state.allBooks.push(payload.book);

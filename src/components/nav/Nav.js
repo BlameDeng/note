@@ -6,8 +6,9 @@ export default {
     components: { "n-icon": Icon, "n-scrollbar": Scrollbar },
     data() {
         return {
-            showAddPop: false, //新建文档弹框
-            retract: true //文件夹收起
+            addPop: false, //新建文档弹框
+            retract: true, //文件夹收起
+            bookPop: false //
         };
     },
     inject: ["eventBus"],
@@ -31,7 +32,7 @@ export default {
     created() {},
     methods: {
         ...mapActions(['createNote', 'getBooks']),
-        ...mapMutations(['setCurrentTab']),
+        ...mapMutations(['setCurrentTab', 'setCurrentBook']),
 
         onAddNote() {
             this.retract = false;
@@ -44,22 +45,30 @@ export default {
         onClickTab(e, tab) {
             this.setCurrentTab(tab);
             if (tab === 'books') {
+                if (this.allBooks) { this.retract = false; return }
                 this.getBooks().then(res => {
-                    this.retract=false;
+                    this.retract = false;
                 }).catch(err => {});
+            } else {
+                this.setCurrentBook(null);
             }
         },
-        onClickBook(e, index, book) {
-            this.showBookPop = false;
-            this.selectedTab = "";
-            let { clientX: x, clientY: y, which } = e;
-            this.selectedBook = book;
-            if (which === 1 && e.target.tagName !== "P") {
-                return;
-            } else {
-                this.notebookPop(x, y, index);
-                this.showBookPop = true;
+        onClickBook(e, book) {
+            this.setCurrentBook(book);
+            if (this.currentTab !== 'books') {
+                this.setCurrentTab('books');
             }
+            let { clientX: x, clientY: y, which } = e;
+            if (which === 3) {
+                let pop = this.$refs.bookPop;
+                pop.style.top = y + 3 + "px";
+                pop.style.left = x + 3 + "px";
+                this.bookPop = true;
+            }
+        },
+        listenPop() {
+            this.addPop ? this.addPop = false : 0;
+            this.bookPop ? this.bookPop = false : 0;
         },
         // listenAddPop() {
         //   this.showAddPop = false;
@@ -92,11 +101,6 @@ export default {
         //     });
         //     this.filterNotebooks({ id: book.id });
         //   });
-        // },
-        // notebookPop(x, y, index) {
-        //   let pop = this.$refs[`bookPop${index}`][0];
-        //   pop.style.top = y + 3 + "px";
-        //   pop.style.left = x + 3 + "px";
         // },
         // onClickRenameBook(book) {
         //   this.renameBook = book;
@@ -139,20 +143,20 @@ export default {
         // }
     },
     watch: {
-        // showAddPop(val) {
-        //   if (val) {
-        //     document.addEventListener("click", this.listenAddPop);
-        //   } else {
-        //     document.removeEventListener("click", this.listenAddPop);
-        //   }
-        // },
-        // showBookPop(val) {
-        //   if (val) {
-        //     document.addEventListener("click", this.listenBookPop);
-        //   } else {
-        //     document.removeEventListener("click", this.listenBookPop);
-        //   }
-        // },
+        addPop(val) {
+          if (val) {
+            document.addEventListener("click", this.listenPop);
+          } else {
+            document.removeEventListener("click", this.listenPop);
+          }
+        },
+        bookPop(val) {
+          if (val) {
+            document.addEventListener("click", this.listenPop);
+          } else {
+            document.removeEventListener("click", this.listenPop);
+          }
+        },
         // selectedBook(val) {
         //   if (val) {
         //     this.getNotes({ notebookId: val.id }).then(res => {
@@ -175,7 +179,7 @@ export default {
         this.$el.oncontextmenu = () => { return false; };
     },
     beforeDestroy() {
-        // document.removeEventListener("click", this.listenAddPop);
-        // document.removeEventListener("click", this.listenBookPop);
+        document.removeEventListener("click", this.listenPop);
+        document.removeEventListener("click", this.listenPop);
     }
 };
