@@ -20,15 +20,15 @@ const mutations = {
         state.currentBook = payload;
     },
     addBook(state, payload) {
-        state.allBooks.push(payload.book);
+        state.allBooks.push(payload);
     },
-    filterBook(state, payload) {
-        state.allBooks = state.allBooks.filter((book) => book.id !== payload.id);
+    deleteBook(state, payload) {
+        state.allBooks = state.allBooks.filter((book) => book.id !== payload);
     },
     updateBook(state, payload) {
         state.allBooks.map(book => {
-            if (book.id === payload.book.id) {
-                book.title = payload.book.title;
+            if (book.id === payload.id) {
+                book.title = payload.title;
             }
         })
     }
@@ -42,19 +42,22 @@ const actions = {
     },
     async createBook({ commit }, { title }) {
         let res = await request({ url: url.createNotebooks, method: 'POST', data: { title } });
-        commit('addBook', { book: res.data });
+        commit('addBook', res.data);
+        commit('setCurrentBook', res.data);
         return res;
     },
-    async deleteBook({ commit }, { bookId }) {
+    async deleteBook({ commit }, bookId) {
         let res = await request({ url: url.deleteNotebooks.replace(':notebookId', bookId), method: 'DELETE' });
+        commit('deleteBook', bookId)
         return res;
     },
     async patchBook({ commit }, { title, bookId }) {
         let res = await request({
-            url: url.renameBook.replace(':notebookId', bookId),
+            url: url.renameNotebooks.replace(':notebookId', bookId),
             method: 'PATCH',
             data: { title }
         });
+        commit('updateBook', { id: bookId, title });
         return res;
     }
 }

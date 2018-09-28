@@ -10,7 +10,8 @@ export default {
             retract: true, //文件夹收起
             bookPop: false, //右键文件弹框
             addBook: false, //新建文件夹命名框
-            bookName: '新文件夹' //
+            bookName: '新文件夹', //新文件夹名字
+            newName: '', //重命名文件夹名字
         };
     },
     inject: ["eventBus"],
@@ -26,29 +27,53 @@ export default {
             currentTab: state => state.notebooks.currentTab,
             allBooks: state => state.notebooks.allBooks,
             currentBook: state => state.notebooks.currentBook,
-            notes: state => state.notes.notes,
-            trashNotes: state => state.notes.trashNotes,
-            currentNote: state => state.notes.currentNote
+            trashNotes: state => state.notes.trashNotes
         })
     },
     created() {
         this.getBooks().then(res => {
-            this.eventBus.$emit('scrollbar-resize');
+            if (!res.data.length) {
+                this.createBook({ title: '默认文件夹' }).then(res => {}).catch(err => {});
+            }
         })
     },
     methods: {
-        ...mapActions(['createNote', 'getBooks','createBook']),
+        ...mapActions([
+            'createNote',
+            'getBooks',
+            'createBook',
+            'deleteBook',
+            'patchBook',
+            'getTrashNotes',
+            'getNotes'
+        ]),
         ...mapMutations(['setCurrentTab', 'setCurrentBook']),
-
         onAddNote() {
+            if (!this.allBooks.length) {
+                this.$message({
+                    type: "warning",
+                    message: "创建笔记前需先创建文件夹",
+                    duration: 1500
+                });
+                return
+            }
             this.retract = false;
-            this.createNote()
+            this.currentTab === 'books' ? 0 : this.setCurrentTab('books');
+            if (!this.currentBook) {
+                this.setCurrentBook(this.allBooks[0]);
+                this.eventBus.$emit('scrollbar-tostart');
+            }
+            this.createNote({
+                notebookId: this.currentBook.id,
+                title: `无标题笔记${this.formatDate(new Date())}`,
+                content: ''
+            }).then(res => {}).catch(err => {});
         },
         onAddBook() {
             this.addBook = true;
-            this.eventBus.$emit('scrollbar-resize');
-            this.eventBus.$emit('scrollbar-toend');
+            this.currentTab === 'books' ? 0 : this.setCurrentTab('books');
             this.retract = false;
+            this.eventBus.$emit('scrollbar-toend');
         },
         onClickTab(e, tab) {
             this.setCurrentTab(tab);
@@ -57,6 +82,11 @@ export default {
                 this.getBooks().then(res => {
                     this.retract = false;
                 }).catch(err => {});
+            } else if (tab === 'trash') {
+                this.setCurrentBook(null);
+                if (!this.trashNotes) {
+                    this.getTrashNotes().then(res => {}).catch(err => {});
+                }
             } else {
                 this.setCurrentBook(null);
             }
@@ -68,93 +98,39 @@ export default {
             }
             let { clientX: x, clientY: y, which } = e;
             if (which === 3) {
+                this.bookPop = true;
                 let pop = this.$refs.bookPop;
                 pop.style.top = y + 3 + "px";
                 pop.style.left = x + 3 + "px";
-                this.bookPop = true;
             }
+            this.getNotes({ notebookId: this.currentBook.id }).then(res => {
+
+            }).catch(err => {});
         },
         listenPop() {
             this.addPop ? this.addPop = false : 0;
             this.bookPop ? this.bookPop = false : 0;
         },
-        onCreateBook(){
-            this.createBook({title:this.bookName}).then(res=>{
-                this.addBook=false;
-                console.log(res)
-            })
+        onCreateBook() {
+            this.createBook({ title: this.bookName }).then(res => {
+                this.addBook = false;
+            }).catch(err => {})
         },
-        // listenAddPop() {
-        //   this.showAddPop = false;
-        // },
-        // listenBookPop() {
-        //   this.showBookPop = false;
-        // },
-
-        // onAddNotebook() {
-        //   if (this.creating) {
-        //     return;
-        //   }
-        //   this.creating = true;
-        //   this.showNewBook = false;
-        //   this.createNotebooks({ title: this.newName }).then(res => {
-        //     this.newName = "新建文件夹";
-        //     this.selectedBook = res.data;
-        //     this.selectedTab = "";
-        //     this.creating = false;
-        //   });
-        // },
-        // onClickDeleteBook(book) {
-        //   this.showBookPop = false;
-        //   this.deleteNotebooks({ notebookId: book.id }).then(res => {
-        //     this.selectedBook = null;
-        //     this.$message({
-        //       type: "info",
-        //       message: "该文件夹已删除",
-        //       duration: 1500
-        //     });
-        //     this.filterNotebooks({ id: book.id });
-        //   });
-        // },
-        // onClickRenameBook(book) {
-        //   this.renameBook = book;
-        //   this.selectedBook = null;
-        //   this.newBookTitle = book.title;
-        // },
-        // onRenameBook(book) {
-        //   if (this.changing) {
-        //     return;
-        //   }
-        //   this.changing = true;
-        //   book.title = this.newBookTitle;
-        //   this.renameNotebooks({
-        //     title: book.title,
-        //     notebookId: book.id
-        //   }).then(res => {
-        //     this.updateNotebooks({ notebook: book });
-        //     this.renameBook = null;
-        //     this.changing = false;
-        //   });
-        // },
-        // onClickNote(note) {
-        //   this.setCurrentNote(note);
-        //   if (this.batchType) {
-        //     let index = this.batchArr.indexOf(note);
-        //     if (index > -1) {
-        //       this.batchArr.splice(index, 1);
-        //       return;
-        //     }
-        //     this.batchArr.push(note);
-        //   }
-        // },
-        // selectAll() {
-        //   this.batchArr = this.trashNotes;
-        //   this.showAllSelect = false;
-        // },
-        // selectNone() {
-        //   this.batchArr = [];
-        //   this.showAllSelect = true;
-        // }
+        onDeleteBook() {
+            this.deleteBook(this.currentBook.id).then(res => {}).catch(err => {});
+        },
+        onPatchBook(type) {
+            if (type === 'rename') {
+                this.newName = this.currentBook.title;
+            } else if (type === 'submit') {
+                this.patchBook({
+                    title: this.newName,
+                    bookId: this.currentBook.id
+                }).then(res => {
+                    this.newName = '';
+                }).catch(err => {})
+            }
+        }
     },
     watch: {
         addPop(val) {
@@ -170,24 +146,7 @@ export default {
             } else {
                 document.removeEventListener("click", this.listenPop);
             }
-        },
-        // selectedBook(val) {
-        //   if (val) {
-        //     this.getNotes({ notebookId: val.id }).then(res => {
-        //       this.eventBus.$emit("select-book");
-        //     });
-        //   }
-        // },
-        // selectedTab(val) {
-        //   if (val !== "trash") {
-        //     this.batchType = false;
-        //     this.batchArr = [];
-        //     this.showAllSelect = true;
-        //   }
-        //   if (val === "books") {
-        //     this.eventBus.$emit("select-tab-books");
-        //   }
-        // },
+        }
     },
     mounted() {
         this.$el.oncontextmenu = () => { return false; };

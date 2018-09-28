@@ -16,18 +16,20 @@
                     return { background: "#ddd" };
                 }
             },
-            height: ''
+            height: ""
         },
         data() {
             return { overHeight: 0, originY: 0 };
         },
-        inject: ['eventBus'],
+        inject: ["eventBus"],
         computed: {},
         created() {
-            this.eventBus.$on('scrollbar-resize', this.resize);
-            this.eventBus.$on('scrollbar-toend',this.scrollToEnd);
-            this.eventBus.$on('select-tab-books', this.resize);
-            this.eventBus.$on('select-book', this.resize);
+            this.eventBus.$on("scrollbar-resize", this.resize);
+            this.eventBus.$on("scrollbar-toend", this.scrollToEnd);
+            this.eventBus.$on("scrollbar-tostart", this.scrollToStart);
+
+            this.eventBus.$on("select-tab-books", this.resize);
+            this.eventBus.$on("select-book", this.resize);
         },
         beforeUpdate() {
             this.resize();
@@ -44,17 +46,17 @@
                     if (m + y <= 0 && y < 0) {
                         slider.style.transform = `translateY(0)`;
                         slot.style.transform = `translateY(0)`;
-                        return
+                        return;
                     }
                     if (m + y >= 150 && y > 0) {
                         slider.style.transform = `translateY(150%)`;
                         slot.style.transform = `translateY(${-this.overHeight}px)`;
-                        return
+                        return;
                     }
                     slider.style.transform = `translateY(${m + y}%)`;
                     slot.style.transform = `translateY(${-scroll * (m + y)}px)`;
                 } else if (!slider.style.transform && y < 0) {
-                    return
+                    return;
                 } else {
                     slider.style.transform = `translateY(${y}%)`;
                     slot.style.transform = `translateY(${-scroll * y}px)`;
@@ -62,7 +64,7 @@
             },
             mousewheel(e) {
                 if (this.overHeight <= 0) {
-                    return
+                    return;
                 }
                 let { deltaY: y } = e;
                 y = y / 4;
@@ -77,7 +79,9 @@
             mousemove(e) {
                 let { clientY: y } = e;
                 let moveY = y - this.originY;
-                if (Math.abs(moveY) < 5) { return }
+                if (Math.abs(moveY) < 5) {
+                    return;
+                }
                 this.scroll(moveY);
                 this.originY = y;
             },
@@ -88,44 +92,62 @@
                 this.$el.removeEventListener("mousemove", this.mousemove);
             },
             scrollToEnd() {
-                this.resize();
-                this.$nextTick(() => {
-                    let slider = this.$refs.slider;
-                    let slot = this.$slots.default[0].elm;
-                    slider.style.transform = `translateY(150%)`;
-                    slot.style.transform = `translateY(${-this.overHeight}px)`;
-                })
+                this.resize().then(() => {
+                    this.$nextTick(() => {
+                        let slider = this.$refs.slider;
+                        let slot = this.$slots.default[0].elm;
+                        slider.style.transform = `translateY(150%)`;
+                        slot.style.transform = `translateY(${-this.overHeight}px)`;
+                    });
+                });
+            },
+            scrollToStart() {
+                this.resize().then(() => {
+                    this.$nextTick(() => {
+                        let slider = this.$refs.slider;
+                        let slot = this.$slots.default[0].elm;
+                        slider.style.transform = `translateY(0)`;
+                        slot.style.transform = `translateY(0)`;
+                    });
+                });
             },
             resize() {
-                this.$nextTick(() => {
-                    let clientHeight = document.documentElement.clientHeight;
+                return new Promise((resolve, reject) => {
+                    this.$nextTick(() => {
+                        let clientHeight = document.documentElement.clientHeight;
 
-                    let slot = this.$slots.default[0].elm;
-                    let { height: slotHeight } = slot.getBoundingClientRect();
+                        let slot = this.$slots.default[0].elm;
+                        let { height: slotHeight } = slot.getBoundingClientRect();
 
-                    let el = this.$el;
-                    let { y } = el.getBoundingClientRect();
+                        let el = this.$el;
+                        let { y } = el.getBoundingClientRect();
 
-                    if (this.height) {
-                        el.style.height = this.height;
-                        this.overHeight = slotHeight - (+this.height.match(/\d+/)[0]);
-                    } else {
-                        el.style.height = clientHeight - y + "px";
-                        this.overHeight = slotHeight - (clientHeight - y);
-                    }
+                        if (this.height) {
+                            el.style.height = this.height;
+                            this.overHeight = slotHeight - +this.height.match(/\d+/)[0];
+                        } else {
+                            el.style.height = clientHeight - y + "px";
+                            this.overHeight = slotHeight - (clientHeight - y);
+                        }
 
-                    if (this.overHeight <= 0) { return }
-                    slot.style.transition = "transform .5s";
-                })
+                        if (this.overHeight <= 0) {
+                            resolve();
+                        }
+                        slot.style.transition = "transform .5s";
+                        resolve();
+                    });
+                });
             }
         },
         mounted() {
-            this.$nextTick(() => { this.resize(); });
+            this.$nextTick(() => {
+                this.resize();
+            });
         },
         beforeDestroy() {
-            this.eventBus.$off('get-trashnotes-done', this.resize);
-            this.eventBus.$off('select-books', this.resize);
-            this.eventBus.$off('select-book', this.resize);
+            this.eventBus.$off("get-trashnotes-done", this.resize);
+            this.eventBus.$off("select-books", this.resize);
+            this.eventBus.$off("select-book", this.resize);
         }
     };
 </script>

@@ -7,8 +7,7 @@ const state = {
     currentNote: null
 }
 
-const getters = {
-}
+const getters = {}
 
 const mutations = {
     setNotes(state, payload) {
@@ -16,7 +15,7 @@ const mutations = {
     },
     addNote(state, payload) {
         state.notes = state.notes || [];
-        state.notes.push(payload.note);
+        state.notes.push(payload);
     },
     deleteNote(state, payload) {
         state.notes = state.notes.filter(note => note.id !== payload.noteId)
@@ -36,11 +35,7 @@ const mutations = {
         state.trashNotes = state.trashNotes.filter(note => note.id !== payload.id)
     },
     setCurrentNote(state, payload) {
-        if (payload&&state.notes) {
-            state.currentNote = state.notes.find(note => note.id === payload.id);
-        } else {
-            state.currentNote = null;
-        }
+        state.currentNote = payload;
     }
 }
 
@@ -52,7 +47,7 @@ const actions = {
             data: { title, content }
         });
         let note = { notebookId, ...res.data };
-        commit('addNote', { note });
+        commit('addNote', note);
         commit('setCurrentNote', note);
         return res;
     },
@@ -67,7 +62,7 @@ const actions = {
             method: 'DELETE'
         });
         commit('deleteNote', { noteId });
-        commit('setCurrentNote',null);
+        commit('setCurrentNote', null);
         return res;
     },
     async patchNote({ commit }, { noteId, title, content }) {

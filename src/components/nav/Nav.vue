@@ -1,5 +1,4 @@
 <template>
-    <!-- 导航区 -->
     <div class="nav">
         <div class="add">
             <n-icon name="add" class="icon" @click="addPop = true" style="cursor:pointer;"></n-icon>
@@ -25,33 +24,32 @@
         <n-scrollbar height="300px" v-show="currentTab==='books'&&!retract">
             <div>
                 <div class="book" v-for="(book,index) in allBooks" :key="book.id" :class="{active:book===currentBook}" @click="onClickBook($event,book)" @click.right="onClickBook($event,book)">
-                    <template v-if="true">
-                        <n-icon name="wenjian" class="icon"></n-icon>
-                        <span>{{book.title}}</span>
-                        <p @click.stop="onClickBook($event,index,book)" ref="bookTri">
-                            <n-icon name="sanjiao" class="icon"></n-icon>
-                        </p>
-                    </template>
                     <!-- 文件夹重命名框 -->
-                    <template v-else>
+                    <template v-if="newName&&currentBook===book">
                         <n-icon name="wenjian" class="icon"></n-icon>
-                        <input type="text" v-select>
+                        <input type="text" v-select v-model="newName" @blur="onPatchBook('submit')">
                     </template>
-                </div>
-                <!-- 右键点击文件夹弹框 -->
-                <div class="book-pop" ref="bookPop" v-show="bookPop">
-                    <p ref="addNote" @click="onAddNote">新建笔记</p>
-                    <p ref="rename">重命名</p>
-                    <p ref="cancle">删除</p>
+                        <template v-else>
+                            <n-icon name="wenjian" class="icon"></n-icon>
+                            <span>{{book.title}}</span>
+                            <p @click.stop="onClickBook($event,index,book)" ref="bookTri">
+                                <n-icon name="sanjiao" class="icon"></n-icon>
+                            </p>
+                        </template>
                 </div>
                 <!-- 新建文件夹命名框 -->
                 <div class="book" v-if="addBook">
                     <n-icon name="wenjian" class="icon"></n-icon>
                     <input type="text" v-select v-model="bookName" @blur="onCreateBook">
                 </div>
-            </div>
+                </div>
         </n-scrollbar>
-
+        <!-- 右键点击文件夹弹框 -->
+        <div class="book-pop" ref="bookPop" v-show="bookPop">
+            <p @click="onAddNote">新建笔记</p>
+            <p @click="onPatchBook('rename')">重命名</p>
+            <p @click="onDeleteBook">删除</p>
+        </div>
         <div class="trash" :class="{active:currentTab==='trash'}" @click="onClickTab($event,'trash')">
             <n-icon name="trash" class="icon"></n-icon>
             <span>回收站</span>
