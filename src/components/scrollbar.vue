@@ -25,14 +25,11 @@
         computed: {},
         created() {
             this.eventBus.$on('scrollbar-resize', this.resize);
-            this.eventBus.$on('scrollbar-toend', () => {
-                this.resize('end');
-            });
+            this.eventBus.$on('scrollbar-toend',this.scrollToEnd);
             this.eventBus.$on('select-tab-books', this.resize);
             this.eventBus.$on('select-book', this.resize);
         },
         beforeUpdate() {
-            console.log('before');
             this.resize();
         },
         methods: {
@@ -90,7 +87,16 @@
             mouseleave() {
                 this.$el.removeEventListener("mousemove", this.mousemove);
             },
-            resize(type) {
+            scrollToEnd() {
+                this.resize();
+                this.$nextTick(() => {
+                    let slider = this.$refs.slider;
+                    let slot = this.$slots.default[0].elm;
+                    slider.style.transform = `translateY(150%)`;
+                    slot.style.transform = `translateY(${-this.overHeight}px)`;
+                })
+            },
+            resize() {
                 this.$nextTick(() => {
                     let clientHeight = document.documentElement.clientHeight;
 
@@ -110,20 +116,11 @@
 
                     if (this.overHeight <= 0) { return }
                     slot.style.transition = "transform .5s";
-                    if (type === 'end') {
-                        let slider = this.$refs.slider;
-                        slider.style.transform = `translateY(150%)`;
-                        slot.style.transform = `translateY(${-this.overHeight}px)`;
-                    }
                 })
             }
         },
         mounted() {
-            this.$el.onselectstart = () => false;
-            this.$nextTick(() => {
-                this.resize();
-            })
-
+            this.$nextTick(() => { this.resize(); });
         },
         beforeDestroy() {
             this.eventBus.$off('get-trashnotes-done', this.resize);
@@ -135,9 +132,9 @@
 <style lang="scss" scoped>
     .x-scrollbar-container {
         width: 100%;
-        height: 100%;
         overflow: hidden;
         position: relative;
+        user-select: none;
         >.scrollbar-position {
             position: absolute;
             top: 0;

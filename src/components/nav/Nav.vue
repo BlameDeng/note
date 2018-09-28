@@ -47,10 +47,11 @@
                 <!-- 新建文件夹命名框 -->
                 <div class="book" v-if="addBook">
                     <n-icon name="wenjian" class="icon"></n-icon>
-                    <input type="text" v-select v-model="bookName">
+                    <input type="text" v-select v-model="bookName" @blur="onCreateBook">
                 </div>
             </div>
         </n-scrollbar>
+
         <div class="trash" :class="{active:currentTab==='trash'}" @click="onClickTab($event,'trash')">
             <n-icon name="trash" class="icon"></n-icon>
             <span>回收站</span>

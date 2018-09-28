@@ -32,12 +32,12 @@ export default {
         })
     },
     created() {
-        // this.getBooks().then(res => {
-        //     this.eventBus.$emit('scrollbar-resize');
-        // })
+        this.getBooks().then(res => {
+            this.eventBus.$emit('scrollbar-resize');
+        })
     },
     methods: {
-        ...mapActions(['createNote', 'getBooks']),
+        ...mapActions(['createNote', 'getBooks','createBook']),
         ...mapMutations(['setCurrentTab', 'setCurrentBook']),
 
         onAddNote() {
@@ -77,6 +77,12 @@ export default {
         listenPop() {
             this.addPop ? this.addPop = false : 0;
             this.bookPop ? this.bookPop = false : 0;
+        },
+        onCreateBook(){
+            this.createBook({title:this.bookName}).then(res=>{
+                this.addBook=false;
+                console.log(res)
+            })
         },
         // listenAddPop() {
         //   this.showAddPop = false;
