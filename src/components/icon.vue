@@ -1,7 +1,9 @@
 <template>
-    <svg class="x-icon" aria-hidden="true" @click="$emit('click',$event)">
-        <use v-bind:xlink:href="`#icon-${name}`"></use>
-    </svg>
+    <span class="icon-wrapper">
+        <svg class="x-icon" aria-hidden="true" @click="$emit('click',$event)">
+            <use v-bind:xlink:href="`#icon-${name}`"></use>
+        </svg>
+    </span>
 </template>
 <script>
     import './svg';
@@ -13,11 +15,15 @@
     }
 </script>
 <style lang="scss" scoped>
-    .x-icon {
-        fill: currentColor;
+    .icon-wrapper {
         width: 1em;
         height: 1em;
-        vertical-align: top;
-        overflow: hidden;
+        .x-icon {
+            fill: currentColor;
+            width: 100%;
+            height: 100%;
+            vertical-align: top;
+            overflow: hidden;
+        }
     }
 </style>

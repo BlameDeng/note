@@ -56,7 +56,7 @@ const actions = {
         commit('setNotes', { notes: res.data });
         return res;
     },
-    async deleteNote({ commit }, { noteId }) {
+    async deleteNote({ commit }, noteId) {
         let res = await request({
             url: url.deleteNote.replace(':noteId', noteId),
             method: 'DELETE'

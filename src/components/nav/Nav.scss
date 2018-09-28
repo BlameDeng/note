@@ -16,9 +16,10 @@
         border-bottom: 1px solid $bcolor1;
         position: relative;
         >.icon {
-            fill: $tcolor;
+            color: $tcolor;
+            margin-left: 15px;
         }
-        >span {
+        >.add-span {
             cursor: pointer;
             margin-left: 15px;
             position: relative;

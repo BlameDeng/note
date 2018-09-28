@@ -1,194 +1,186 @@
 @import '@/assets/base.scss';
-.detail-bar {
-    display: flex;
-    width: 500px;
-    height: 100%;
-    font-size: 12px;
+.detail {
+    width: 250px;
     flex-grow: 0;
     flex-shrink: 0;
-    justify-content: center;
-    align-items: stretch;
-    >.detail {
-        width: 250px;
-        flex-grow: 0;
-        flex-shrink: 0;
-        border-right: 1px solid $bcolor1;
+    border-right: 1px solid $bcolor1;
+    font-size: 12px;
+    position: relative;
+    >.search {
+        height: 60px;
+        text-align: center;
+        vertical-align: middle;
         position: relative;
-        >.search {
-            height: 60px;
-            text-align: center;
-            vertical-align: middle;
-            position: relative;
+        border-bottom: 1px solid $bcolor1;
+        >.icon {
+            font-size: 16px;
+            color: $tcolor2;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            margin-left: 9px;
+            cursor: pointer;
+            &:hover {
+                color: $tcolor;
+            }
+        }
+        >input {
+            width: 160px;
+            height: 36px;
+            margin-top: 12px;
+            border: 1px solid $bcolor1;
+            border-radius: 18px;
+            padding: 0 28px;
+            &:focus {
+                outline: none;
+            }
+        }
+    }
+    >.widget {
+        width: 100%;
+        overflow: hidden;
+        .book {
+            cursor: pointer;
+            padding: 5px 0 5px 20px;
             border-bottom: 1px solid $bcolor1;
-            >.icon {
-                font-size: 16px;
-                fill: $tcolor2;
-                position: absolute;
-                top: 50%;
-                transform: translateY(-50%);
-                margin-left: 9px;
-                cursor: pointer;
-                &:hover {
-                    fill: $tcolor;
+            >.icon-wrapper {
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                padding: 10px 0;
+                position: relative;
+                >span {
+                    margin-left: 10px;
+                }
+                >.icon {
+                    &:last-child {
+                        margin-left: auto;
+                        margin-right: 20px;
+                        font-size: 16px;
+                        color: transparent;
+                    }
+                    &.revert {
+                        position: absolute;
+                        top: 50%;
+                        right: 43px;
+                        transform: translateY(-50%);
+                        font-size: 16px;
+                        color: transparent;
+                    }
                 }
             }
-            >input {
-                width: 160px;
-                height: 36px;
-                margin-top: 12px;
-                border: 1px solid $bcolor1;
-                border-radius: 18px;
-                padding: 0 28px;
-                &:focus {
-                    outline: none;
+            >p {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                padding-bottom: 5px;
+                color: $tcolor3;
+            }
+            >span {
+                padding-bottom: 10px;
+                color: $tcolor4;
+            }
+            &:hover {
+                background: $hcolor2;
+                >.icon-wrapper {
+                    >.icon {
+                        &:last-child {
+                            color: $tcolor2;
+                            &:hover {
+                                color: $tcolor;
+                            }
+                        }
+                        &.revert {
+                            color: $tcolor2;
+                            &:hover {
+                                color: $tcolor;
+                            }
+                        }
+                    }
+                }
+                >p {
+                    border-top-color: #666;
+                }
+            }
+            &.active {
+                background: $acolor;
+                >.icon-wrapper {
+                    >.icon {
+                        &:last-child {
+                            display: inline;
+                        }
+                    }
+                }
+                &:hover {
+                    >p {
+                        border-top-color: #fff;
+                    }
+                }
+            }
+            &.batch-type {
+                box-shadow: inset 0 0 2px #FF0000;
+            }
+        }
+        .no-note {
+            width: 100%;
+            // height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding-top: 300px;
+            >p {
+                margin-bottom: 10px;
+                color: $tcolor3;
+            }
+            >.el-btn {
+                padding: 8px 20px;
+                background: $tcolor;
+                color: #fff;
+                &:hover {
+                    background: #337ed5;
                 }
             }
         }
-        >.widget {
-            // width: 100%;height: 100%;
-            .book {
-                cursor: pointer;
-                padding: 5px 0 5px 20px;
-                border-bottom: 1px solid $bcolor1;
-                >.icon-wrapper {
-                    display: flex;
-                    justify-content: flex-start;
-                    align-items: center;
-                    padding: 10px 0;
-                    position: relative;
-                    >span {
-                        margin-left: 10px;
-                    }
-                    >.icon {
-                        &:last-child {
-                            margin-left: auto;
-                            margin-right: 20px;
-                            font-size: 16px;
-                            fill: transparent;
-                        }
-                        &.revert {
-                            position: absolute;
-                            top: 50%;
-                            right: 43px;
-                            transform: translateY(-50%);
-                            font-size: 16px;
-                            fill: transparent;
-                        }
-                    }
-                }
-                >p {
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    padding-bottom: 5px;
-                    color: $tcolor3;
-                }
-                >span {
-                    padding-bottom: 10px;
-                    color: $tcolor4;
-                }
-                &:hover {
-                    background: $hcolor2;
-                    >.icon-wrapper {
-                        >.icon {
-                            &:last-child {
-                                fill: $tcolor2;
-                                &:hover {
-                                    fill: $tcolor;
-                                }
-                            }
-                            &.revert {
-                                fill: $tcolor2;
-                                &:hover {
-                                    fill: $tcolor;
-                                }
-                            }
-                        }
-                    }
-                    >p {
-                        border-top-color: #666;
-                    }
-                }
-                &.active {
-                    background: $acolor;
-                    >.icon-wrapper {
-                        >.icon {
-                            &:last-child {
-                                display: inline;
-                            }
-                        }
-                    }
-                    &:hover {
-                        >p {
-                            border-top-color: #fff;
-                        }
-                    }
-                }
-                &.batch-type {
-                    box-shadow: inset 0 0 2px #FF0000;
-                }
-            }
-            .no-note {
-                width: 100%;
-                // height: 100%;
+        .batch {
+            cursor: pointer;
+            padding: 5px 0 5px 20px;
+            border-bottom: 1px solid $bcolor1;
+            position: relative;
+            z-index: 1;
+            background: #fff;
+            height: 100%;
+            >.icon-wrapper {
                 display: flex;
-                flex-direction: column;
-                justify-content: center;
+                justify-content: flex-start;
                 align-items: center;
-                padding-top: 300px;
-                >p {
-                    margin-bottom: 10px;
-                    color: $tcolor3;
+                padding: 10px 0;
+                position: relative;
+                >span {
+                    margin-left: 10px;
                 }
-                >.el-btn {
-                    padding: 8px 20px;
-                    background: $tcolor;
-                    color: #fff;
-                    &:hover {
-                        background: #337ed5;
+            }
+            >.option {
+                padding: 5px 0 5px 0;
+                text-align: center;
+                >span {
+                    margin: 0 5px;
+                    padding: 4px 10px;
+                    border-radius: 15px;
+                    background: #ddd;
+                    color: $tcolor2;
+                    &.info {
+                        background: #fff;
+                        color: $tcolor4;
                     }
                 }
             }
-            .batch {
-                cursor: pointer;
-                padding: 5px 0 5px 20px;
-                border-bottom: 1px solid $bcolor1;
-                position: relative;
-                z-index: 1;
-                background: #fff;
-                height: 100%;
-                >.icon-wrapper {
-                    display: flex;
-                    justify-content: flex-start;
-                    align-items: center;
-                    padding: 10px 0;
-                    position: relative;
-                    >span {
-                        margin-left: 10px;
-                    }
-                }
+            &:hover {
+                background: $hcolor2;
                 >.option {
-                    padding: 5px 0 5px 0;
-                    text-align: center;
                     >span {
-                        margin: 0 5px;
-                        padding: 4px 10px;
-                        border-radius: 15px;
-                        background: #ddd;
-                        color: $tcolor2;
                         &.info {
-                            background: #fff;
-                            color: $tcolor4;
-                        }
-                    }
-                }
-                &:hover {
-                    background: $hcolor2;
-                    >.option {
-                        >span {
-                            &.info {
-                                background: $hcolor2;
-                            }
+                            background: $hcolor2;
                         }
                     }
                 }

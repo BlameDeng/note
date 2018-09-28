@@ -27,14 +27,21 @@
             this.eventBus.$on("scrollbar-resize", this.resize);
             this.eventBus.$on("scrollbar-toend", this.scrollToEnd);
             this.eventBus.$on("scrollbar-tostart", this.scrollToStart);
-
-            this.eventBus.$on("select-tab-books", this.resize);
-            this.eventBus.$on("select-book", this.resize);
         },
         beforeUpdate() {
             this.resize();
         },
         methods: {
+            reset() {
+
+                let slider = this.$refs.slider;
+                let slot = this.$slots.default[0].elm;
+                if (slider) {
+                    slider.style.transform = `translateY(0)`;
+                }
+                slot.style.transform = `translateY(0)`;
+
+            },
             scroll(y) {
                 //y其实就是slider每次滚动偏移百分比的变化值
                 let scroll = this.overHeight / 150;
@@ -92,6 +99,7 @@
                 this.$el.removeEventListener("mousemove", this.mousemove);
             },
             scrollToEnd() {
+                if (this.overHeight <= 0) { return }
                 this.resize().then(() => {
                     this.$nextTick(() => {
                         let slider = this.$refs.slider;
@@ -99,17 +107,21 @@
                         slider.style.transform = `translateY(150%)`;
                         slot.style.transform = `translateY(${-this.overHeight}px)`;
                     });
-                });
+                }).catch(err => {});
             },
-            scrollToStart() {
+            scrollToStart(num) {
+                console.log(num)
+                if (this.overHeight <= 0) { return }
                 this.resize().then(() => {
                     this.$nextTick(() => {
                         let slider = this.$refs.slider;
                         let slot = this.$slots.default[0].elm;
-                        slider.style.transform = `translateY(0)`;
+                        if (slider) {
+                            slider.style.transform = `translateY(0)`;
+                        }
                         slot.style.transform = `translateY(0)`;
                     });
-                });
+                }).catch(err => {});
             },
             resize() {
                 return new Promise((resolve, reject) => {
@@ -133,6 +145,7 @@
                         if (this.overHeight <= 0) {
                             resolve();
                         }
+                        let slider = this.$refs.slider;
                         slot.style.transition = "transform .5s";
                         resolve();
                     });
@@ -145,9 +158,9 @@
             });
         },
         beforeDestroy() {
-            this.eventBus.$off("get-trashnotes-done", this.resize);
-            this.eventBus.$off("select-books", this.resize);
-            this.eventBus.$off("select-book", this.resize);
+            this.eventBus.$off("scrollbar-resize", this.resize);
+            this.eventBus.$off("scrollbar-toend", this.scrollToEnd);
+            this.eventBus.$off("scrollbar-tostart", this.scrollToStart);
         }
     };
 </script>

@@ -7,7 +7,7 @@ export default {
     data() {
         return {
             addPop: false, //新建文档弹框
-            retract: true, //文件夹收起
+            retract: false, //文件夹收起
             bookPop: false, //右键文件弹框
             addBook: false, //新建文件夹命名框
             bookName: '新文件夹', //新文件夹名字
@@ -33,7 +33,7 @@ export default {
     created() {
         this.getBooks().then(res => {
             if (!res.data.length) {
-                this.createBook({ title: '默认文件夹' }).then(res => {}).catch(err => {});
+                this.createBook({ title: '我的资源' }).then(res => {}).catch(err => {});
             }
         })
     },
@@ -71,25 +71,27 @@ export default {
         },
         onAddBook() {
             this.addBook = true;
-            this.currentTab === 'books' ? 0 : this.setCurrentTab('books');
+            this.setCurrentTab('books');
             this.retract = false;
-            this.eventBus.$emit('scrollbar-toend');
+            this.$nextTick(() => {
+                this.eventBus.$emit('scrollbar-toend');
+            })
         },
         onClickTab(e, tab) {
             this.setCurrentTab(tab);
             if (tab === 'books') {
-                if (this.allBooks) { this.retract = false; return }
-                this.getBooks().then(res => {
-                    this.retract = false;
-                }).catch(err => {});
+                if (!this.allBooks) {
+                    this.getBooks().then(res => {
+                        this.retract = false;
+                    }).catch(err => {});
+                }
+                this.retract = false;
             } else if (tab === 'trash') {
-                this.setCurrentBook(null);
                 if (!this.trashNotes) {
                     this.getTrashNotes().then(res => {}).catch(err => {});
                 }
-            } else {
-                this.setCurrentBook(null);
             }
+            this.setCurrentBook(null);
         },
         onClickBook(e, book) {
             this.setCurrentBook(book);
@@ -104,7 +106,7 @@ export default {
                 pop.style.left = x + 3 + "px";
             }
             this.getNotes({ notebookId: this.currentBook.id }).then(res => {
-
+                this.eventBus.$emit('nav-click-book');
             }).catch(err => {});
         },
         listenPop() {
@@ -113,6 +115,7 @@ export default {
         },
         onCreateBook() {
             this.createBook({ title: this.bookName }).then(res => {
+                this.bookName = '新文件夹';
                 this.addBook = false;
             }).catch(err => {})
         },
