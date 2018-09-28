@@ -24,9 +24,10 @@
         inject: ['eventBus'],
         computed: {},
         created() {
-            this.eventBus.$on('get-trashnotes-done', this.reSize);
-            this.eventBus.$on('select-tab-books', this.reSize);
-            this.eventBus.$on('select-book', this.reSize);
+            this.eventBus.$on('scrollbar-resize', this.resize);
+            this.eventBus.$on('scrollbar-toend', this.resize('end'));
+            this.eventBus.$on('select-tab-books', this.resize);
+            this.eventBus.$on('select-book', this.resize);
         },
         methods: {
             scroll(y) {
@@ -83,7 +84,7 @@
             mouseleave() {
                 this.$el.removeEventListener("mousemove", this.mousemove);
             },
-            reSize() {
+            resize(type) {
                 let clientHeight = document.documentElement.clientHeight;
                 let { y } = this.$el.getBoundingClientRect();
                 this.$el.style.height = this.height || (clientHeight - y + "px");
@@ -98,17 +99,22 @@
                     }
                     if (this.overHeight <= 0) { return }
                     slot.style.transition = "transform .5s";
+                    if (type === 'end') {
+                        let slider = this.$refs.slider;
+                        slider.style.transform = `translateY(150%)`;
+                        slot.style.transform = `translateY(${-this.overHeight}px)`;
+                    }
                 })
             }
         },
         mounted() {
             this.$el.onselectstart = () => false;
-            this.reSize();
+            // this.resize();
         },
         beforeDestroy() {
-            this.eventBus.$off('get-trashnotes-done', this.reSize);
-            this.eventBus.$off('select-books', this.reSize);
-            this.eventBus.$off('select-book', this.reSize);
+            this.eventBus.$off('get-trashnotes-done', this.resize);
+            this.eventBus.$off('select-books', this.resize);
+            this.eventBus.$off('select-book', this.resize);
         }
     };
 </script>

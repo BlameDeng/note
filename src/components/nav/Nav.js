@@ -8,7 +8,9 @@ export default {
         return {
             addPop: false, //新建文档弹框
             retract: true, //文件夹收起
-            bookPop: false //
+            bookPop: false, //右键文件弹框
+            addBook: false, //新建文件夹命名框
+            bookName: '新文件夹' //
         };
     },
     inject: ["eventBus"],
@@ -29,7 +31,11 @@ export default {
             currentNote: state => state.notes.currentNote
         })
     },
-    created() {},
+    created() {
+        this.getBooks().then(res => {
+            this.eventBus.$emit('scrollbar-resize');
+        })
+    },
     methods: {
         ...mapActions(['createNote', 'getBooks']),
         ...mapMutations(['setCurrentTab', 'setCurrentBook']),
@@ -39,8 +45,10 @@ export default {
             this.createNote()
         },
         onAddBook() {
-            this.showNewBook = true;
-            this.retractBooks = false;
+            this.addBook = true;
+            this.eventBus.$emit('scrollbar-resize');
+            this.eventBus.$emit('scrollbar-toend');
+            this.retract = false;
         },
         onClickTab(e, tab) {
             this.setCurrentTab(tab);
@@ -144,18 +152,18 @@ export default {
     },
     watch: {
         addPop(val) {
-          if (val) {
-            document.addEventListener("click", this.listenPop);
-          } else {
-            document.removeEventListener("click", this.listenPop);
-          }
+            if (val) {
+                document.addEventListener("click", this.listenPop);
+            } else {
+                document.removeEventListener("click", this.listenPop);
+            }
         },
         bookPop(val) {
-          if (val) {
-            document.addEventListener("click", this.listenPop);
-          } else {
-            document.removeEventListener("click", this.listenPop);
-          }
+            if (val) {
+                document.addEventListener("click", this.listenPop);
+            } else {
+                document.removeEventListener("click", this.listenPop);
+            }
         },
         // selectedBook(val) {
         //   if (val) {
