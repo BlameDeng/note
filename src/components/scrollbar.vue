@@ -24,24 +24,14 @@
         inject: ["eventBus"],
         computed: {},
         created() {
-            this.eventBus.$on("scrollbar-resize", this.resize);
-            this.eventBus.$on("scrollbar-toend", this.scrollToEnd);
-            this.eventBus.$on("scrollbar-tostart", this.scrollToStart);
+            // this.eventBus.$on("scrollbar-resize", this.resize);
+            // this.eventBus.$on("scrollbar-toend", this.scrollToEnd);
+            // this.eventBus.$on("scrollbar-tostart", this.scrollToStart);
         },
         beforeUpdate() {
             this.resize();
         },
         methods: {
-            reset() {
-
-                let slider = this.$refs.slider;
-                let slot = this.$slots.default[0].elm;
-                if (slider) {
-                    slider.style.transform = `translateY(0)`;
-                }
-                slot.style.transform = `translateY(0)`;
-
-            },
             scroll(y) {
                 //y其实就是slider每次滚动偏移百分比的变化值
                 let scroll = this.overHeight / 150;
@@ -99,29 +89,31 @@
                 this.$el.removeEventListener("mousemove", this.mousemove);
             },
             scrollToEnd() {
+                let slider = this.$refs.slider;
+                let slot = this.$slots.default[0].elm;
                 if (this.overHeight <= 0) { return }
                 this.resize().then(() => {
-                    this.$nextTick(() => {
-                        let slider = this.$refs.slider;
-                        let slot = this.$slots.default[0].elm;
-                        slider.style.transform = `translateY(150%)`;
-                        slot.style.transform = `translateY(${-this.overHeight}px)`;
-                    });
+                    // this.$nextTick(() => {
+                    slider.style.transform = `translateY(150%)`;
+                    slot.style.transform = `translateY(${-this.overHeight}px)`;
+                    // });
                 }).catch(err => {});
             },
-            scrollToStart(num) {
-                console.log(num)
-                if (this.overHeight <= 0) { return }
-                this.resize().then(() => {
-                    this.$nextTick(() => {
-                        let slider = this.$refs.slider;
-                        let slot = this.$slots.default[0].elm;
+            scrollToStart() {
+                let slider = this.$refs.slider;
+                let slot = this.$slots.default[0].elm;
+                if (this.overHeight <= 0) {
+                    slot.style.transform = `translateY(0)`;
+                } else {
+                    this.resize().then(() => {
+                        // this.$nextTick(() => {
                         if (slider) {
                             slider.style.transform = `translateY(0)`;
                         }
                         slot.style.transform = `translateY(0)`;
-                    });
-                }).catch(err => {});
+                        // });
+                    }).catch(err => {});
+                }
             },
             resize() {
                 return new Promise((resolve, reject) => {
@@ -142,9 +134,7 @@
                             this.overHeight = slotHeight - (clientHeight - y);
                         }
 
-                        if (this.overHeight <= 0) {
-                            resolve();
-                        }
+                        if (this.overHeight <= 0) { resolve(); }
                         let slider = this.$refs.slider;
                         slot.style.transition = "transform .5s";
                         resolve();
@@ -158,9 +148,9 @@
             });
         },
         beforeDestroy() {
-            this.eventBus.$off("scrollbar-resize", this.resize);
-            this.eventBus.$off("scrollbar-toend", this.scrollToEnd);
-            this.eventBus.$off("scrollbar-tostart", this.scrollToStart);
+            // this.eventBus.$off("scrollbar-resize", this.resize);
+            // this.eventBus.$off("scrollbar-toend", this.scrollToEnd);
+            // this.eventBus.$off("scrollbar-tostart", this.scrollToStart);
         }
     };
 </script>
@@ -181,7 +171,7 @@
                 display: none;
                 width: 100%;
                 height: 40%;
-                transition: all 0.5s;
+                transition: transform .5s;
             }
         }
         &:hover {

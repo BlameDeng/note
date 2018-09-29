@@ -7,7 +7,7 @@ export default {
     data() {
         return {
             addPop: false, //新建文档弹框
-            retract: false, //文件夹收起
+            retract: true, //文件夹收起
             bookPop: false, //右键文件弹框
             addBook: false, //新建文件夹命名框
             bookName: '新文件夹', //新文件夹名字
@@ -61,21 +61,23 @@ export default {
             this.currentTab === 'books' ? 0 : this.setCurrentTab('books');
             if (!this.currentBook) {
                 this.setCurrentBook(this.allBooks[0]);
-                this.eventBus.$emit('scrollbar-tostart');
+                this.getNotes({ notebookId: this.currentBook.id }).then(res => {
+                    this.$refs.bookScrollbar.scrollToStart();
+                }).catch(err => {});
             }
             this.createNote({
                 notebookId: this.currentBook.id,
                 title: `无标题笔记${this.formatDate(new Date())}`,
                 content: ''
-            }).then(res => {}).catch(err => {});
+            }).then(res => {
+                this.eventBus.$emit('note-added');
+            }).catch(err => {});
         },
         onAddBook() {
             this.addBook = true;
             this.setCurrentTab('books');
             this.retract = false;
-            this.$nextTick(() => {
-                this.eventBus.$emit('scrollbar-toend');
-            })
+            this.$refs.bookScrollbar.scrollToEnd();
         },
         onClickTab(e, tab) {
             this.setCurrentTab(tab);

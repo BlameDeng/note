@@ -22,7 +22,7 @@
             <span>我的文件夹</span>
         </div>
         <!-- 展示文件夹列表  -->
-        <n-scrollbar height="300px" v-show="!retract">
+        <n-scrollbar height="300px" v-show="!retract" ref="bookScrollbar">
             <div>
                 <div class="book" v-for="(book,index) in allBooks" :key="book.id" 
                 :class="{active:book===currentBook}" @click="onClickBook($event,book)" 

@@ -26,7 +26,8 @@ export default {
         })
     },
     created() {
-        this.eventBus.$on('nav-click-book', this.callNoteScrollbar);
+        this.eventBus.$on('nav-click-book', this.callScrollbarStart);
+        this.eventBus.$on('note-added',this.callScrollbarEnd);
     },
     methods: {
         ...mapActions([
@@ -35,8 +36,11 @@ export default {
             'getNotes'
         ]),
         ...mapMutations(['setCurrentBook', 'setCurrentNote']),
-        callNoteScrollbar() {
-        this.$refs.noteScrollbar.reset.call(this.$refs.noteScrollbar,'123');
+        callScrollbarStart() {
+            this.$refs.noteScrollbar.scrollToStart();
+        },
+        callScrollbarEnd() {
+            this.$refs.noteScrollbar.scrollToEnd();
         },
         onClickBook(book) {
             this.setCurrentBook(book);
