@@ -39,7 +39,8 @@ export default {
             'getNotes',
             'revertNote',
             'deleteNoteConfirm',
-            'revertNote'
+            'revertNote',
+            'createNote'
         ]),
         ...mapMutations(['setCurrentBook', 'setCurrentNote']),
         callScrollbarStart() {
@@ -60,9 +61,18 @@ export default {
         onClickNote(note) {
             this.setCurrentNote(note);
         },
+        onAddNote() {
+            this.createNote({
+                notebookId: this.currentBook.id,
+                title: `无标题笔记${this.formatDate(new Date())}`,
+                content: ''
+            }).then(res => {
+                this.eventBus.$emit('note-added');
+            }).catch(err => {});
+        },
         onDeleteNote(note) {
             this.deleteNote(note).then(res => {
-
+                this.$refs.noteScrollbar.scrollToStart();
             }).catch(err => {});
         },
         onRevert(note) {
@@ -75,9 +85,10 @@ export default {
                     type: "warning"
                 })
                 .then(() => {
+                    this.$refs.noteScrollbar.scrollToStart();
                     this.deleteNoteConfirm(note).then(res => {
                         this.$message({
-                            type: "success",
+                            type: "info",
                             message: "删除成功!",
                             duration: 1500
                         });
@@ -172,7 +183,7 @@ export default {
         this.$el.oncontextmenu = () => { return false; };
     },
     beforeDestroy() {
-        // document.removeEventListener("click", this.listenAddPop);
-        // document.removeEventListener("click", this.listenBookPop);
-    }
+        this.eventBus.$off('nav-click-book', this.callScrollbarStart);
+        this.eventBus.$off('note-added', this.callScrollbarEnd);
+    },
 };

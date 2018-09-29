@@ -107,6 +107,7 @@ export default {
             if (slider) {
               slider.style.transform = `translateY(0)`;
             }
+            console.log(1)
             slot.style.transform = `translateY(0)`;
           })
           .catch(err => {});

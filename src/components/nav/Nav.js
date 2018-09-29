@@ -1,6 +1,6 @@
 import Icon from "../icon.vue";
 import Scrollbar from "../scrollbar.vue";
-import { mapState, mapActions, mapMutations } from "vuex";
+import { mapState,mapGetters, mapActions, mapMutations } from "vuex";
 export default {
     name: "Nav",
     components: { "n-icon": Icon, "n-scrollbar": Scrollbar },

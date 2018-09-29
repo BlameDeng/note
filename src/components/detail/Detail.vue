@@ -34,7 +34,7 @@
                     </div>
                     <div class="no-note" v-if="notes&&notes.length===0">
                         <p>没有找到文件</p>
-                        <el-button plain class="el-btn">新建笔记</el-button>
+                        <el-button plain class="el-btn" @click="onAddNote">新建笔记</el-button>
                     </div>
                 </div>
             </n-scrollbar>
@@ -59,7 +59,7 @@
                 </div>
 
                 <!-- 笔记列表 -->
-                <n-scrollbar v-show="currentTab==='trash'" :slider="{background:'#409EFF',opacity:0.3}">
+                <n-scrollbar v-show="currentTab==='trash'" :slider="{background:'#409EFF',opacity:0.3}" ref="noteScrollbar">
                     <div class="scroll-wrapper">
                         <div class="book" v-for="note in trashNotes" :key="note.id" v-if="trashNotes&&trashNotes.length" 
                         :class="{['batch-type']:batchNotes.indexOf(note)>-1}" @click="onClickTrashNote(note)">

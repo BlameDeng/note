@@ -18,12 +18,11 @@
                 </el-select>
             </div>
         </div>
-        <n-scrollbar :slider="{background:'#409EFF',opacity:0.3}" ref="scroll" v-if="content" v-show="!preview">
-            <pre class="context" ref="context" contenteditable="true" @focus="auto" 
-            :style="{['font-size']:`${fontSize}px`}" v-text="content" @blur="input">
+        <n-scrollbar :slider="{background:'#409EFF',opacity:0.3}" ref="context" v-if="title" v-show="!preview">
+            <pre class="content" ref="content" contenteditable="true" :style="{['font-size']:`${fontSize}px`}" @blur="changeContent" v-text="content">
             </pre>
         </n-scrollbar>
-        <n-scrollbar :slider="{background:'#409EFF',opacity:0.3}" ref="scroll" v-if="content" v-show="preview">
+        <n-scrollbar :slider="{background:'#409EFF',opacity:0.3}" ref="preview" v-if="title" v-show="preview">
             <div class="preview" v-html="markdown" :style="{['font-size']:`${fontSize}px`}"></div>
         </n-scrollbar>
     </div>
@@ -31,7 +30,7 @@
 <script>
     import Scrollbar from "./scrollbar.vue";
     import marked from "marked";
-    import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
+    import { mapActions, mapState, mapMutations } from "vuex";
     export default {
         name: "Article",
         components: { "n-scrollbar": Scrollbar },
@@ -71,12 +70,14 @@
             }
         },
         inject: ["eventBus"],
+        created(){
+            this.eventBus.$on('note-added',this.selectTitle);
+        },
         methods: {
             ...mapActions(["createNote", "patchNote"]),
             onSaveNote() {
-                if (this.saving) {
-                    return;
-                }
+                this.content = this.$refs.content.innerText;
+                if (this.saving) { return; }
                 this.saving = true;
                 this.patchNote({
                     noteId: this.currentNote.id,
@@ -93,35 +94,38 @@
             },
             onPreview() {
                 this.preview = !this.preview;
+                this.$refs.context ? this.$refs.context.scrollToStart() : 0;
+                this.$refs.preview ? this.$refs.preview.scrollToStart() : 0;
             },
-            auto() {
-                let context = this.$refs.context;
-                setInterval(() => {
-                    this.$refs.scroll.resize();
-                    let txt = context.innerHTML.replace(/<\/[pbr]\/?>/g, '&nbsp;&nbsp;&nbsp;').replace(/<\/?[^>]*>/g, '')
-                    console.log(txt);
-                    console.log(context.innerText)
-                }, 4000)
+            resizeScroll() {
+                this.$refs.context.resize();
             },
-            input() {
-                this.content = this.$refs.context.innerText;
-                this.$refs.context.focus();
+            changeContent() {
+                this.content = this.$refs.content.innerText;
+            },
+            selectTitle(){
+                this.$refs.input.select();
             }
-        },
-        mounted() {
-            this.$nextTick(() => {})
         },
         watch: {
             currentNote: {
                 handler: function(val) {
+                    this.$refs.context ? this.$refs.context.scrollToStart() : 0;
+                    this.$refs.preview ? this.$refs.preview.scrollToStart() : 0;
                     if (val) {
                         this.title = val.title;
                         this.content = val.content;
+                    }else{
+                        this.title='';
+                        this.content='';
                     }
                 },
                 deep: true,
                 immediate: true
             }
+        },
+        beforeDestroy(){
+            this.eventBus.$off('note-added',this.selectTitle);
         }
     };
 </script>
@@ -177,7 +181,7 @@
                 border-radius: 3px;
             }
         }
-        .context {
+        .content {
             flex-grow: 1;
             min-height: 100px;
             position: absolute;
@@ -191,7 +195,6 @@
         }
         .preview {
             width: 100%;
-            height: 100%;
             font-size: 18px;
             padding: .5em;
         }
