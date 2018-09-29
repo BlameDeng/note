@@ -18,18 +18,15 @@
                 </el-select>
             </div>
         </div>
-        <div class="context" ref="context">
-            <n-scrollbar :slider="{background:'#409EFF',opacity:0.3}" v-if="currentNote"
-            ref="scroll">
-                <!-- <div class="inner-wrapper" v-if="currentNote"> -->
-                <!-- <textarea v-model="currentNote.content" ref="textarea" v-if="currentNote"
-                    v-show="!preview" :style="{['font-size']:`${fontSize}px`}" 
-                    @input="auto"></textarea> -->
-                <div class="fake-textarea" contenteditable="true" ref="fake" @keyup="abc"></div>
-                <!-- <div class="preview" v-show="preview" v-html="markdown"></div> -->
-                <!-- </div> -->
-            </n-scrollbar>
-        </div>
+        <n-scrollbar :slider="{background:'#409EFF',opacity:0.3}" ref="scroll" v-if="currentNote" v-show="!preview">
+            <pre class="context" ref="context" contenteditable="true" @focus="auto" 
+            :style="{['font-size']:`${fontSize}px`}" 
+            v-text="currentNote.content">
+            </pre>
+        </n-scrollbar>
+        <n-scrollbar :slider="{background:'#409EFF',opacity:0.3}" ref="scroll" v-if="currentNote" v-show="preview">
+            <div class="preview" v-html="markdown"></div>
+        </n-scrollbar>
     </div>
 </template>
 <script>
@@ -97,47 +94,19 @@
                 this.preview = !this.preview;
             },
             auto() {
-                // this.$nextTick(() => {
-                //     let textarea = this.$refs.textarea;
-
-                //     console.log(textarea.getBoundingClientRect());
-                //     console.log(textarea.scrollHeight);
-                //     // textarea.style.height = 'auto';
-                //     textarea.style.scrollTop = 0;
-                //     textarea.style.height = textarea.scrollHeight + 'px';
-                // })
-            },
-            abc(){
-              this.$refs.scroll.resize();  
+                let context = this.$refs.context;
+                setInterval(() => {
+                    this.$refs.scroll.resize();
+                    let txt = context.innerHTML.replace(/<\/[pbr]\/?>/g, '&nbsp;&nbsp;&nbsp;').replace(/<\/?[^>]*>/g, '')
+                    console.log(txt);
+                    console.log(context.innerText)
+                }, 4000)
             }
         },
         mounted() {
-            this.$nextTick(() => {
-            })
-            // setInterval(() => {
-            //     console.log(this.$refs.fake.innerHTML)
-            // }, 3000)
-
+            this.$nextTick(() => {})
         },
-        beforeUpdate() {
-            // let textarea = this.$refs.textarea;
-            // let { height } = this.$refs.context.getBoundingClientRect();
-            // let { height: tHeight } = this.$refs.textarea.getBoundingClientRect();
-
-            // if (textarea.scrollHeight <= height) {
-            //     textarea.style.height = height + 'px';
-            // } else {
-            //     textarea.style.height = 'auto';
-            // }
-
-            // if (tHeight>=0) {
-
-            // }
-            console.log(this.$refs.fake)
-            this.$refs.scroll.resize();
-
-
-        },
+        beforeUpdate() {},
     };
 </script>
 <style lang="scss" scoped>
@@ -145,9 +114,10 @@
     .article {
         width: 100%;
         height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
+        // display: flex;
+        // flex-direction: column;
+        // justify-content: flex-start;
+        overflow: hidden;
         >.title-bar {
             height: 60px;
             flex-grow: 0;
@@ -194,39 +164,45 @@
                 border-radius: 3px;
             }
         }
-        >.context {
+        .context {
             flex-grow: 1;
+            min-height: 100px;
+            border: 1px solid red;
+            position: absolute;
+            top: 0;
+            left: 0;
             // display: flex;
             // flex-direction: column;
             // justify-content: stretch;
             width: 100%;
-            // .inner-wrapper {
-            // textarea {
-            //     width: 100%;
-            //     height: 100%;
-            //     border: none;
-            //     font-size: 18px;
-            //     padding: 0.5em;
-            //     display: block;
-            //     overflow-x: hidden;
-            //     overflow-y: hidden;
-            //     resize: none;
-            //     border: 1px solid red;
-            //     &:focus {
-            //         outline: none;
-            //     }
-            // }
-            .fake-textarea {
-                min-height: 100px;
-                border: 1px solid red;
-            }
-            .preview {
+            .inner-wrapper {
                 width: 100%;
-                height: 100%;
-                font-size: 18px;
-                padding: 1em;
+                // textarea {
+                //     width: 100%;
+                //     height: 100%;
+                //     border: none;
+                //     font-size: 18px;
+                //     padding: 0.5em;
+                //     display: block;
+                //     overflow-x: hidden;
+                //     overflow-y: hidden;
+                //     resize: none;
+                //     border: 1px solid red;
+                //     &:focus {
+                //         outline: none;
+                //     }
+                // }
+                .fake-textarea {
+                    min-height: 100px;
+                    border: 1px solid red;
+                }
+                .preview {
+                    width: 100%;
+                    height: 100%;
+                    font-size: 18px;
+                    padding: 1em;
+                }
             }
-            // }
         }
     }
 </style>
