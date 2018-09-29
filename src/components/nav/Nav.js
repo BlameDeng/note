@@ -123,6 +123,7 @@ export default {
         },
         onDeleteBook() {
             this.deleteBook(this.currentBook.id).then(() => {
+                this.$refs.bookScrollbar.scrollToStart();
                 this.$message({
                     type: "info",
                     message: "文件夹删除成功!",
