@@ -65,19 +65,6 @@
             }
         },
         inject: ["eventBus"],
-        // created() {
-        //     this.eventBus.$on("click-add-note", book => {
-        //         this.createNote({
-        //                 notebookId: book.id,
-        //                 title: `无标题笔记 ${this.formatDate(new Date())}`,
-        //                 content: ""
-        //             })
-        //             .then(res => {
-        //                 this.$refs.input.select();
-        //             })
-        //             .catch(err => {});
-        //     });
-        // },
         methods: {
             ...mapActions(["createNote", "patchNote"]),
             onSaveNote() {
@@ -101,9 +88,6 @@
             onPreview() {
                 this.preview = !this.preview;
             },
-        },
-        beforeDestroy() {
-            this.eventBus.$off("click-add-note");
         }
     };
 </script>

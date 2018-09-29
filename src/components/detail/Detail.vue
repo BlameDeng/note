@@ -7,33 +7,27 @@
         </div>
         <div class="widget">
             <!-- 展示文件夹列表 -->
-            <n-scrollbar v-show="currentTab==='books'&&!currentBook" 
-            :slider="{background:'#409EFF',opacity:0.3}">
+            <n-scrollbar v-show="currentTab==='books'&&!currentBook" :slider="{background:'#409EFF',opacity:0.3}">
                 <div>
-                    <div class="book" v-for="book in allBooks" :key="book.id" 
-                    v-if="allBooks&&allBooks.length" :class="{active:currentBook===book}" 
-                    @click="onClickBook(book)">
+                    <div class="book" v-for="book in allBooks" :key="book.id" v-if="allBooks&&allBooks.length" :class="{active:currentBook===book}" @click="onClickBook(book)">
                         <div class="icon-wrapper">
                             <n-icon name="wenjian" class="icon"></n-icon>
                             <span>{{book.title}}</span>
                             <n-icon name="trash" class="icon" @click.stop="onDeleteBook(book)" title="删除文件夹"></n-icon>
                         </div>
-                        <span>{{formatDate(book.createdAt)}}</span>
+                        <span>{{formatDate(book.createdAt)}}</span> 
                     </div>
                 </div>
             </n-scrollbar>
             <!-- 展示选中的文件夹中的笔记 -->
-            <n-scrollbar v-show="currentTab==='books'&&currentBook" 
-            :slider="{background:'#409EFF',opacity:0.3}" ref="noteScrollbar">
+            <n-scrollbar v-show="currentTab==='books'&&currentBook" :slider="{background:'#409EFF',opacity:0.3}" ref="noteScrollbar">
                 <div>
-                    <div class="book" v-for="note in notes" 
-                    :key="note.id" v-if="notes&&notes.length" 
-                    :class="{active:currentNote===note}" @click="onClickNote(note)">
+                    
+                    <div class="book" v-for="note in notes" :key="note.id" v-if="notes&&notes.length" :class="{active:currentNote===note}" @click="onClickNote(note)">
                         <div class="icon-wrapper">
                             <n-icon name="note" class="icon"></n-icon>
                             <span>{{note.title}}</span>
-                            <n-icon name="trash" class="icon" title="放入回收站" 
-                            @click.stop="onDeleteNote(note)"></n-icon>
+                            <n-icon name="trash" class="icon" title="放入回收站" @click.stop="onDeleteNote(note)"></n-icon>
                         </div>
                         <p>{{note.content}}</p>
                         <span>{{formatDate(note.createdAt)}}</span>
@@ -65,26 +59,21 @@
                 </div>
 
                 <!-- 笔记列表 -->
-            <n-scrollbar v-show="currentTab==='trash'" 
-            :slider="{background:'#409EFF',opacity:0.3}">
-                <div class="scroll-wrapper">
-                    <div class="book" v-for="note in trashNotes" :key="note.id" 
-                    v-if="trashNotes&&trashNotes.length" 
-                    :class="{['batch-type']:batchNotes.indexOf(note)>-1}"
-                    @click="onClickNote(note)">
-                        <div class="icon-wrapper">
-                            <n-icon name="note" class="icon"></n-icon>
-                            <span>{{note.title}}</span>
-                            <n-icon name="revert" class="icon revert" 
-                            title="恢复到原文件夹" @click="onRevert(note)"></n-icon>
-                            <n-icon name="trash" class="icon" 
-                            title="彻底删除" @click="onDeleteConfirm(note)"></n-icon>
+                <n-scrollbar v-show="currentTab==='trash'" :slider="{background:'#409EFF',opacity:0.3}">
+                    <div class="scroll-wrapper">
+                        <div class="book" v-for="note in trashNotes" :key="note.id" v-if="trashNotes&&trashNotes.length" 
+                        :class="{['batch-type']:batchNotes.indexOf(note)>-1}" @click="onClickTrashNote(note)">
+                            <div class="icon-wrapper">
+                                <n-icon name="note" class="icon"></n-icon>
+                                <span>{{note.title}}</span>
+                                <n-icon name="revert" class="icon revert" title="恢复到原文件夹" @click="onRevert(note)"></n-icon>
+                                <n-icon name="trash" class="icon" title="彻底删除" @click="onDeleteConfirm(note)"></n-icon>
+                            </div>
+                            <p>{{note.content}}</p>
+                            <span>{{formatDate(note.createdAt)}}</span>
                         </div>
-                        <p>{{note.content}}</p>
-                        <span>{{formatDate(note.createdAt)}}</span>
                     </div>
-                </div>
-            </n-scrollbar>
+                </n-scrollbar>
 
 
             </div>

@@ -72,7 +72,6 @@ const actions = {
             data: { title, content }
         });
         commit('updateNote', { noteId, title, content });
-        commit('setCurrentNote', { id: noteId });
         return res;
     },
     async getTrashNotes({ commit }) {
