@@ -122,7 +122,13 @@ export default {
             }).catch(err => {})
         },
         onDeleteBook() {
-            this.deleteBook(this.currentBook.id).then(res => {}).catch(err => {});
+            this.deleteBook(this.currentBook.id).then(() => {
+                this.$message({
+                    type: "info",
+                    message: "文件夹删除成功!",
+                    duration: 1500
+                });
+            }).catch(err => {});
         },
         onPatchBook(type) {
             if (type === 'rename') {

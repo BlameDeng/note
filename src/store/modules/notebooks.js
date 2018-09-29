@@ -48,7 +48,8 @@ const actions = {
     },
     async deleteBook({ commit }, bookId) {
         let res = await request({ url: url.deleteNotebooks.replace(':notebookId', bookId), method: 'DELETE' });
-        commit('deleteBook', bookId)
+        commit('deleteBook', bookId);
+        commit('setCurrentBook', null);
         return res;
     },
     async patchBook({ commit }, { title, bookId }) {
