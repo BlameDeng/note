@@ -50,17 +50,17 @@
                 <div class="batch" v-show="currentTab==='trash'">
                     <div class="icon-wrapper">
                         <n-icon name="piliang" class="icon"></n-icon>
-                        <span>批量操作</span>
-                        <span>取消批量选择</span>
+                        <span @click="batchType=true" v-show="!batchType">批量操作</span>
+                        <span @click="batchType=false" v-show="batchType">取消批量选择</span>
                     </div>
                     <div class="option">
                         <span class="info">回收站中的笔记最多可保存30天哦~~</span>
                     </div>
-                    <div class="option">
-                        <span>批量删除</span>
-                        <span>批量恢复</span>
-                        <span>全选</span>
-                        <span>取消</span>
+                    <div class="option" v-show="batchType">
+                        <span @click="onBatchDelete">批量删除</span>
+                        <span @click="onBatchRevert">批量恢复</span>
+                        <span @click="selectAll" v-if="batchNotes!==trashNotes">全选</span>
+                        <span @click="cancleAll" v-else>取消</span>
                     </div>
                 </div>
 
@@ -70,12 +70,15 @@
                 <div class="scroll-wrapper">
                     <div class="book" v-for="note in trashNotes" :key="note.id" 
                     v-if="trashNotes&&trashNotes.length" 
-                    :class="{}">
+                    :class="{['batch-type']:batchNotes.indexOf(note)>-1}"
+                    @click="onClickNote(note)">
                         <div class="icon-wrapper">
                             <n-icon name="note" class="icon"></n-icon>
                             <span>{{note.title}}</span>
-                            <n-icon name="revert" class="icon revert" title="恢复到原文件夹"></n-icon>
-                            <n-icon name="trash" class="icon" title="彻底删除"></n-icon>
+                            <n-icon name="revert" class="icon revert" 
+                            title="恢复到原文件夹" @click="onRevert(note)"></n-icon>
+                            <n-icon name="trash" class="icon" 
+                            title="彻底删除" @click="onDeleteConfirm(note)"></n-icon>
                         </div>
                         <p>{{note.content}}</p>
                         <span>{{formatDate(note.createdAt)}}</span>

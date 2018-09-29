@@ -78,6 +78,7 @@
             }
             >span {
                 padding-bottom: 10px;
+                padding-left: 10px;
                 color: $tcolor4;
             }
             &:hover {
@@ -150,6 +151,7 @@
             z-index: 1;
             background: #fff;
             height: 100%;
+            user-select: none;
             >.icon-wrapper {
                 display: flex;
                 justify-content: flex-start;
@@ -170,6 +172,7 @@
                     background: #ddd;
                     color: $tcolor2;
                     &.info {
+                        margin-left: -10px;
                         background: #fff;
                         color: $tcolor4;
                     }

@@ -5,7 +5,10 @@ export default {
     name: "Detail",
     components: { "n-icon": Icon, "n-scrollbar": Scrollbar },
     data() {
-        return {};
+        return {
+            batchType: false,
+            batchNotes: []
+        };
     },
     inject: ["eventBus"],
     directives: {
@@ -27,13 +30,16 @@ export default {
     },
     created() {
         this.eventBus.$on('nav-click-book', this.callScrollbarStart);
-        this.eventBus.$on('note-added',this.callScrollbarEnd);
+        this.eventBus.$on('note-added', this.callScrollbarEnd);
     },
     methods: {
         ...mapActions([
             'deleteBook',
             'deleteNote',
-            'getNotes'
+            'getNotes',
+            'revertNote',
+            'deleteNoteConfirm',
+            'revertNote'
         ]),
         ...mapMutations(['setCurrentBook', 'setCurrentNote']),
         callScrollbarStart() {
@@ -58,32 +64,98 @@ export default {
             this.deleteNote(note.id).then(res => {
 
             }).catch(err => {});
+        },
+        onRevert(note) {
+            this.revertNote(note);
+        },
+        onDeleteConfirm(note) {
+            this.$confirm("此操作将永久删除该笔记, 是否继续?", "提示", {
+                    confirmButtonText: "确定删除",
+                    cancelButtonText: "取消删除",
+                    type: "warning"
+                })
+                .then(() => {
+                    this.deleteNoteConfirm(note).then(res => {
+                        this.$message({
+                            type: "success",
+                            message: "删除成功!",
+                            duration: 1500
+                        });
+                    });
+                })
+                .catch(() => {
+                    this.$message({
+                        type: "info",
+                        message: "已取消删除",
+                        duration: 1500
+                    });
+                });
+        },
+        onClickNote(note) {
+            if (!this.batchType) {
+                return
+            }
+            let index = this.batchNotes.indexOf(note);
+            if (index > -1) {
+                this.batchNotes.splice(index, 1);
+            } else {
+                this.batchNotes.push(note);
+            }
+        },
+        onBatchDelete() {
+            if (this.batchNotes.length === 0) {
+                this.$message({
+                    type: "warning",
+                    message: "请至少选择一个笔记哦~~",
+                    duration: 1500
+                });
+                return
+            }
+            this.$confirm("此操作将永久删除选中的笔记, 是否继续?", "提示", {
+                    confirmButtonText: "确定删除",
+                    cancelButtonText: "取消删除",
+                    type: "warning"
+                })
+                .then(
+                    () => {
+                        const promises = this.batchNotes.map(note => {
+                            return this.deleteNoteConfirm(note);
+                        });
+                        Promise.all(promises).then(res => {
+                            this.$message({
+                                type: "info",
+                                message: "批量删除成功!",
+                                duration: 1500
+                            });
+                        }).catch(err => {});
+                    }).catch(err => {});
+        },
+        onBatchRevert() {
+            if (this.batchNotes.length === 0) {
+                this.$message({
+                    type: "warning",
+                    message: "请至少选择一个笔记哦~~",
+                    duration: 1500
+                });
+                return
+            }
+            const promises = this.batchNotes.map(note => {
+                return this.revertNote(note);
+            });
+            Promise.all(promises).then(res => {
+                this.$message({
+                    type: "success",
+                    message: "批量恢复成功!",
+                    duration: 1500
+                });
+            }).catch(err => {});
+        },
+        selectAll() {
+            this.batchNotes = this.trashNotes;
+        },
+        cancleAll() {
+            this.batchNotes = [];
         }
-        // onAddNotebook() {
-        //     if (this.creating) {
-        //         return;
-        //     }
-        //     this.creating = true;
-        //     this.showNewBook = false;
-        //     this.createNotebooks({ title: this.newName }).then(res => {
-        //         this.newName = "新建文件夹";
-        //         this.selectedBook = res.data;
-        //         this.selectedTab = "";
-        //         this.creating = false;
-        //     });
-        // },
-        // onClickDeleteBook(book) {
-        //     this.showBookPop = false;
-        //     this.deleteNotebooks({ notebookId: book.id }).then(res => {
-        //         this.selectedBook = null;
-        //         this.$message({
-        //             type: "info",
-        //             message: "该文件夹已删除",
-        //             duration: 1500
-        //         });
-        //         this.filterNotebooks({ id: book.id });
-        //     });
-        // },
         // onClickBook(e, index, book) {
         //     this.showBookPop = false;
         //     this.selectedTab = "";
@@ -231,7 +303,11 @@ export default {
         // }
     },
     watch: {
-
+        batchType(val) {
+            if (!val) {
+                this.batchNotes = [];
+            }
+        }
     },
     mounted() {
         this.$el.oncontextmenu = () => { return false; };
