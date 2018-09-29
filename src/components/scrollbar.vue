@@ -119,7 +119,7 @@ export default {
 
           let slot = this.$slots.default[0].elm;
           let { height: slotHeight } = slot.getBoundingClientRect();
-
+console.log(slotHeight)
           let el = this.$el;
           let { y } = el.getBoundingClientRect();
 

@@ -18,19 +18,27 @@
                 </el-select>
             </div>
         </div>
-        <div class="context">
-            <div class="inner-wrapper" v-show="currentNote">
-                <textarea v-model="currentNote.content" ref="textarea" v-show="!preview" :style="{['font-size']:`${fontSize}px`}" v-if="currentNote"></textarea>
-                <div class="preview" v-show="preview" v-html="markdown"></div>
-            </div>
+        <div class="context" ref="context">
+            <n-scrollbar :slider="{background:'#409EFF',opacity:0.3}" v-if="currentNote"
+            ref="scroll">
+                <!-- <div class="inner-wrapper" v-if="currentNote"> -->
+                <!-- <textarea v-model="currentNote.content" ref="textarea" v-if="currentNote"
+                    v-show="!preview" :style="{['font-size']:`${fontSize}px`}" 
+                    @input="auto"></textarea> -->
+                <div class="fake-textarea" contenteditable="true" ref="fake" @keyup="abc"></div>
+                <!-- <div class="preview" v-show="preview" v-html="markdown"></div> -->
+                <!-- </div> -->
+            </n-scrollbar>
         </div>
     </div>
 </template>
 <script>
+    import Scrollbar from "./scrollbar.vue";
     import marked from "marked";
     import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
     export default {
         name: "Article",
+        components: { "n-scrollbar": Scrollbar },
         data() {
             return {
                 saving: false,
@@ -88,7 +96,48 @@
             onPreview() {
                 this.preview = !this.preview;
             },
-        }
+            auto() {
+                // this.$nextTick(() => {
+                //     let textarea = this.$refs.textarea;
+
+                //     console.log(textarea.getBoundingClientRect());
+                //     console.log(textarea.scrollHeight);
+                //     // textarea.style.height = 'auto';
+                //     textarea.style.scrollTop = 0;
+                //     textarea.style.height = textarea.scrollHeight + 'px';
+                // })
+            },
+            abc(){
+              this.$refs.scroll.resize();  
+            }
+        },
+        mounted() {
+            this.$nextTick(() => {
+            })
+            // setInterval(() => {
+            //     console.log(this.$refs.fake.innerHTML)
+            // }, 3000)
+
+        },
+        beforeUpdate() {
+            // let textarea = this.$refs.textarea;
+            // let { height } = this.$refs.context.getBoundingClientRect();
+            // let { height: tHeight } = this.$refs.textarea.getBoundingClientRect();
+
+            // if (textarea.scrollHeight <= height) {
+            //     textarea.style.height = height + 'px';
+            // } else {
+            //     textarea.style.height = 'auto';
+            // }
+
+            // if (tHeight>=0) {
+
+            // }
+            console.log(this.$refs.fake)
+            this.$refs.scroll.resize();
+
+
+        },
     };
 </script>
 <style lang="scss" scoped>
@@ -96,9 +145,12 @@
     .article {
         width: 100%;
         height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
         >.title-bar {
             height: 60px;
-            flex-grow: 1;
+            flex-grow: 0;
             border-bottom: 1px solid $bcolor1;
             >.inner-wrapper {
                 height: 100%;
@@ -134,6 +186,7 @@
             color: $tcolor3;
             font-size: 12px;
             height: 33px;
+            flex-grow: 0;
             input {
                 padding: 2px .5em;
                 text-align: center;
@@ -142,22 +195,38 @@
             }
         }
         >.context {
-            textarea {
-                // height: 710px;
-                width: 100%;
-                border: none;
-                font-size: 18px;
-                padding: 0.5em;
-                &:focus {
-                    outline: none;
-                }
+            flex-grow: 1;
+            // display: flex;
+            // flex-direction: column;
+            // justify-content: stretch;
+            width: 100%;
+            // .inner-wrapper {
+            // textarea {
+            //     width: 100%;
+            //     height: 100%;
+            //     border: none;
+            //     font-size: 18px;
+            //     padding: 0.5em;
+            //     display: block;
+            //     overflow-x: hidden;
+            //     overflow-y: hidden;
+            //     resize: none;
+            //     border: 1px solid red;
+            //     &:focus {
+            //         outline: none;
+            //     }
+            // }
+            .fake-textarea {
+                min-height: 100px;
+                border: 1px solid red;
             }
             .preview {
-                // height: 710px;
                 width: 100%;
+                height: 100%;
                 font-size: 18px;
                 padding: 1em;
             }
+            // }
         }
     }
 </style>

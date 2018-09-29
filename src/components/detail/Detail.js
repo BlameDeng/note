@@ -31,7 +31,6 @@ export default {
     created() {
         this.eventBus.$on('nav-click-book', this.callScrollbarStart);
         this.eventBus.$on('note-added', this.callScrollbarEnd);
-        console.log(this.currentNote)
     },
     methods: {
         ...mapActions([
@@ -43,7 +42,6 @@ export default {
             'revertNote'
         ]),
         ...mapMutations(['setCurrentBook', 'setCurrentNote']),
-        onClick() { alert(1) },
         callScrollbarStart() {
             this.$refs.noteScrollbar.scrollToStart();
         },
