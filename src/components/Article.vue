@@ -1,8 +1,8 @@
 <template>
     <div class="article">
         <div class="title-bar">
-            <div class="inner-wrapper" v-show="currentNote">
-                <input type="text" v-model.trim="currentNote.title" ref="input" v-if="currentNote">
+            <div class="inner-wrapper" v-if="title">
+                <input type="text" v-model.trim="title" ref="input" v-if="currentNote">
                 <div class="btn-wrapper">
                     <el-button plain class="el-btn" @click="onSaveNote">保存</el-button>
                     <el-button plain class="el-btn" @click="onPreview" :class="{[`preview-btn`]:preview}">Markdown 预览</el-button>
@@ -10,7 +10,7 @@
             </div>
         </div>
         <div class="tool-bar">
-            <div class="inner-wrapper" v-show="currentNote">
+            <div class="inner-wrapper" v-if="title">
                 <span>字体大小</span>
                 <el-select v-model="fontSize" size="mini" style="width:65px;">
                     <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
@@ -18,14 +18,13 @@
                 </el-select>
             </div>
         </div>
-        <n-scrollbar :slider="{background:'#409EFF',opacity:0.3}" ref="scroll" v-if="currentNote" v-show="!preview">
+        <n-scrollbar :slider="{background:'#409EFF',opacity:0.3}" ref="scroll" v-if="content" v-show="!preview">
             <pre class="context" ref="context" contenteditable="true" @focus="auto" 
-            :style="{['font-size']:`${fontSize}px`}" 
-            v-text="currentNote.content">
+            :style="{['font-size']:`${fontSize}px`}" v-text="content" @blur="input">
             </pre>
         </n-scrollbar>
-        <n-scrollbar :slider="{background:'#409EFF',opacity:0.3}" ref="scroll" v-if="currentNote" v-show="preview">
-            <div class="preview" v-html="markdown"></div>
+        <n-scrollbar :slider="{background:'#409EFF',opacity:0.3}" ref="scroll" v-if="content" v-show="preview">
+            <div class="preview" v-html="markdown" :style="{['font-size']:`${fontSize}px`}"></div>
         </n-scrollbar>
     </div>
 </template>
@@ -41,6 +40,8 @@
                 saving: false,
                 preview: false,
                 fontSize: 14,
+                title: '',
+                content: '',
                 options: [{
                     value: 12,
                     label: 12
@@ -64,8 +65,8 @@
                 currentNote: state => state.notes.currentNote
             }),
             markdown() {
-                if (this.currentNote) {
-                    return marked(this.currentNote.content);
+                if (this.content) {
+                    return marked(this.content);
                 }
             }
         },
@@ -78,9 +79,9 @@
                 }
                 this.saving = true;
                 this.patchNote({
-                    noteId: this.note.id,
-                    title: this.note.title,
-                    content: this.note.content
+                    noteId: this.currentNote.id,
+                    title: this.title,
+                    content: this.content
                 }).then(res => {
                     this.saving = false;
                     this.$message({
@@ -101,12 +102,27 @@
                     console.log(txt);
                     console.log(context.innerText)
                 }, 4000)
+            },
+            input() {
+                this.content = this.$refs.context.innerText;
+                this.$refs.context.focus();
             }
         },
         mounted() {
             this.$nextTick(() => {})
         },
-        beforeUpdate() {},
+        watch: {
+            currentNote: {
+                handler: function(val) {
+                    if (val) {
+                        this.title = val.title;
+                        this.content = val.content;
+                    }
+                },
+                deep: true,
+                immediate: true
+            }
+        }
     };
 </script>
 <style lang="scss" scoped>
@@ -114,9 +130,6 @@
     .article {
         width: 100%;
         height: 100%;
-        // display: flex;
-        // flex-direction: column;
-        // justify-content: flex-start;
         overflow: hidden;
         >.title-bar {
             height: 60px;
@@ -167,42 +180,20 @@
         .context {
             flex-grow: 1;
             min-height: 100px;
-            border: 1px solid red;
             position: absolute;
             top: 0;
             left: 0;
-            // display: flex;
-            // flex-direction: column;
-            // justify-content: stretch;
             width: 100%;
-            .inner-wrapper {
-                width: 100%;
-                // textarea {
-                //     width: 100%;
-                //     height: 100%;
-                //     border: none;
-                //     font-size: 18px;
-                //     padding: 0.5em;
-                //     display: block;
-                //     overflow-x: hidden;
-                //     overflow-y: hidden;
-                //     resize: none;
-                //     border: 1px solid red;
-                //     &:focus {
-                //         outline: none;
-                //     }
-                // }
-                .fake-textarea {
-                    min-height: 100px;
-                    border: 1px solid red;
-                }
-                .preview {
-                    width: 100%;
-                    height: 100%;
-                    font-size: 18px;
-                    padding: 1em;
-                }
+            padding: .5em;
+            &:focus {
+                outline: none;
             }
+        }
+        .preview {
+            width: 100%;
+            height: 100%;
+            font-size: 18px;
+            padding: .5em;
         }
     }
 </style>

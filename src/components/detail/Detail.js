@@ -61,7 +61,7 @@ export default {
             this.setCurrentNote(note);
         },
         onDeleteNote(note) {
-            this.deleteNote(note.id).then(res => {
+            this.deleteNote(note).then(res => {
 
             }).catch(err => {});
         },
@@ -122,6 +122,7 @@ export default {
                             return this.deleteNoteConfirm(note);
                         });
                         Promise.all(promises).then(res => {
+                            this.batchNotes = [];
                             this.$message({
                                 type: "info",
                                 message: "批量删除成功!",
@@ -143,6 +144,7 @@ export default {
                 return this.revertNote(note);
             });
             Promise.all(promises).then(res => {
+                this.batchNotes = [];
                 this.$message({
                     type: "success",
                     message: "批量恢复成功!",

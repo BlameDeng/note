@@ -20,6 +20,10 @@ const mutations = {
     deleteNote(state, payload) {
         state.notes = state.notes.filter(note => note.id !== payload.noteId)
     },
+    addTrashNote(state, note) {
+        state.trashNotes = state.trashNotes || [];
+        state.trashNotes.push(note);
+    },
     updateNote(state, payload) {
         state.notes.map(note => {
             if (note.id === payload.noteId) {
@@ -56,12 +60,13 @@ const actions = {
         commit('setNotes', { notes: res.data });
         return res;
     },
-    async deleteNote({ commit }, noteId) {
+    async deleteNote({ commit }, note) {
         let res = await request({
-            url: url.deleteNote.replace(':noteId', noteId),
+            url: url.deleteNote.replace(':noteId', note.id),
             method: 'DELETE'
         });
-        commit('deleteNote', { noteId });
+        commit('deleteNote', { noteId:note.id });
+        commit('addTrashNote', note);
         commit('setCurrentNote', null);
         return res;
     },
