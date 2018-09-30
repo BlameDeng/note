@@ -60,7 +60,7 @@
     import Icon from './icon.vue'
     import Upload from "@/components/upload/upload.vue"
     import { mapState, mapActions } from 'vuex'
-    import AV from 'leancloud-storage'
+    import Notebooks from '@/helpers/leancloud.js'
     export default {
         name: 'Header',
         components: { 'n-icon': Icon, 'n-upload': Upload },
@@ -80,7 +80,9 @@
             })
         },
         created() {
-             console.log(AV)
+            // Notebooks.saveAll({ name: 'jim', age: 20 }).then(res => {
+            //     console.log(res)
+            // }).catch(err => { console.log(err) })
         },
         methods: {
             ...mapActions(['logout']),
