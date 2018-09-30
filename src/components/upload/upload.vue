@@ -1,7 +1,7 @@
 <template>
     <div>
         <button id="btn">123</button>
-        <button id="start">321</button>
+        <button id="start" @click="onClick">321</button>
     </div>
 </template>
 <script>
@@ -43,7 +43,7 @@
                     suffix = get_suffix(filename)
                     calculate_object_name(filename)
                 }
-              let  new_multipart_params = {
+                let new_multipart_params = {
                     'key': g_object_name,
                     'policy': policyBase64,
                     'OSSAccessKeyId': accessid,
@@ -63,7 +63,7 @@
                 url: 'https://notebooksavatar.oss-cn-shenzhen.aliyuncs.com', //服务器端的上传页面地址
                 silverlight_xap_url: 'js/Moxie.xap', //silverlight文件，当需要使用silverlight方式进行上传时需要配置该参数
                 init: function() {
-                    set_upload_param(uploader, '', false);
+                    // set_upload_param(uploader, '', false);
                 },
             });
 
@@ -87,6 +87,12 @@
                 uploader.start(); //调用实例对象的start()方法开始上传文件，当然你也可以在其他地方调用该方法
             }
         },
+        methods: {
+            onClick() {
+                set_upload_param(uploader, '', false);
+                return false;
+            }
+        }
     }
 </script>
 <style lang="scss" scoped>
