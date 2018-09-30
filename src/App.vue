@@ -32,6 +32,7 @@
         width: 100%;
         height: 100%;
     }
+    ol,li{list-style: none;}
     img {
         vertical-align: middle;
     }

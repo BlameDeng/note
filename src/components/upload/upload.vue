@@ -1,24 +1,18 @@
 <template>
-    <div>
+    <div id="my-plupload">
         <form name=theform>
             <input type="radio" name="myradio" value="local_name" checked=true /> 上传文件名字保持本地文件名字
             <input type="radio" name="myradio" value="random_name" /> 上传文件名字是随机文件名
             <br />
             上传到指定目录:<input type="text" id='dirname' placeholder="如果不填，默认是上传到根目录" size=50>
         </form>
-
         <h4>您所选择的文件列表：</h4>
         <div id="ossfile">你的浏览器不支持flash,Silverlight或者HTML5！</div>
-
         <br />
-
-        <div id="container">
-            <a id="selectfiles" href="javascript:void(0);" class='btn'>选择文件</a>
-            <a id="postfiles" href="javascript:void(0);" class='btn'>开始上传</a>
+        <div id="plupload-container">
+            <a id="plupload-selectfiles" href="javascript:void(0);" class='btn'>选择文件</a>
+            <a id="plupload-postfiles" href="javascript:void(0);" class='btn'>开始上传</a>
         </div>
-
-        <pre id="console"></pre>
-
         <p>&nbsp;</p>
     </div>
 </template>
@@ -30,23 +24,21 @@
     import Base64 from './base64.js';
     export default {
         name: 'Upload',
+        props: {
+            containerId: { type: String, default: 'plupload-container' },
+            browseId: { type: String, default: 'plupload-selectfiles' },
+            postId: { type: String, default: '' }
+        },
         data() {
             return {
-                uploader: null,
-                instance: null,
-                accessid: '',
-                policy: '',
-                signature: '',
-                host: ''
+                url: ''
             }
         },
         mounted() {
-            // console.log(encodeURIComponent(encodeURIComponent(accessid)))
-
+            let that = this;
             let accessid = 'LTAIW5DpJ9UZaAvE';
             let accesskey = 'BujhhVwR2C8u1CyhHrxSXmlNOxlPtA';
             let host = 'https://notebooksavatar.oss-cn-shenzhen.aliyuncs.com';
-
             let g_dirname = ''
             let g_object_name = ''
             let g_object_name_type = ''
@@ -80,7 +72,6 @@
                 if (dir != '' && dir.indexOf('/') != dir.length - 1) {
                     dir = dir + '/'
                 }
-                //alert(dir)
                 g_dirname = dir
             }
 
@@ -147,9 +138,9 @@
 
             var uploader = new plupload.Uploader({
                 runtimes: 'html5,flash,silverlight,html4',
-                browse_button: 'selectfiles',
+                browse_button: that.browseId,
                 multi_selection: false,
-                container: document.getElementById('container'),
+                container: document.getElementById(that.containerId),
                 flash_swf_url: 'lib/plupload-2.1.2/js/Moxie.swf',
                 silverlight_xap_url: 'lib/plupload-2.1.2/js/Moxie.xap',
                 url: host,
@@ -158,18 +149,23 @@
                 init: {
                     PostInit: function() {
                         document.getElementById('ossfile').innerHTML = '';
-                        document.getElementById('postfiles').onclick = function() {
-                            set_upload_param(uploader, '', false);
-                            return false;
-                        };
+                        if (that.postId) {
+                            document.getElementById(that.postId).onclick = function() {
+                                set_upload_param(uploader, '', false);
+                                return false;
+                            };
+                        }
                     },
 
                     FilesAdded: function(up, files) {
-                        plupload.each(files, function(file) {
-                            document.getElementById('ossfile').innerHTML += '<div id="' + file.id + '">' + file.name + ' (' + plupload.formatSize(file.size) + ')<b></b>' +
-                                '<div class="progress"><div class="progress-bar" style="width: 0%"></div></div>' +
-                                '</div>';
-                        });
+                        if (!that.postId) {
+                            set_upload_param(uploader, '', false);
+                        }
+                        // plupload.each(files, function(file) {
+                        //     document.getElementById('ossfile').innerHTML += '<div id="' + file.id + '">' + file.name + ' (' + plupload.formatSize(file.size) + ')<b></b>' +
+                        //         '<div class="progress"><div class="progress-bar" style="width: 0%"></div></div>' +
+                        //         '</div>';
+                        // });
                     },
 
                     BeforeUpload: function(up, file) {
@@ -179,32 +175,38 @@
                     },
 
                     UploadProgress: function(up, file) {
-                        var d = document.getElementById(file.id);
-                        d.getElementsByTagName('b')[0].innerHTML = '<span>' + file.percent + "%</span>";
-                        var prog = d.getElementsByTagName('div')[0];
-                        var progBar = prog.getElementsByTagName('div')[0]
-                        progBar.style.width = 2 * file.percent + 'px';
-                        progBar.setAttribute('aria-valuenow', file.percent);
+                        // var d = document.getElementById(file.id);
+                        // d.getElementsByTagName('b')[0].innerHTML = '<span>' + file.percent + "%</span>";
+                        // var prog = d.getElementsByTagName('div')[0];
+                        // var progBar = prog.getElementsByTagName('div')[0]
+                        // progBar.style.width = 2 * file.percent + 'px';
+                        // progBar.setAttribute('aria-valuenow', file.percent);
                     },
 
                     FileUploaded: function(up, file, info) {
                         if (info.status == 200) {
-                            document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = 'upload to oss success, object name:' + get_uploaded_object_name(file.name);
-                            console.log('url' + '\n' + host + '/' + get_uploaded_object_name(file.name) + '?x-oss-process=style/avatar');
+                            // document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = 'upload to oss success, object name:' + get_uploaded_object_name(file.name);
+                            that.url = host + '/' + get_uploaded_object_name(file.name) + '?x-oss-process=style/avatar';
+                            that.$emit('uploaded', that.url);
                         } else {
-                            document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = info.response;
+                            // document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = info.response;
                         }
                     },
 
-                    Error: function(up, err) {
-                        document.getElementById('console').appendChild(document.createTextNode("\nError xml:" + err.response));
-                    }
+                    Error: function(up, err) {}
                 }
             });
             uploader.init();
-        },
+        }
     }
 </script>
 <style lang="scss" scoped>
-
+    #my-plupload {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 0;
+        overflow: hidden;
+    }
 </style>

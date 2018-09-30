@@ -16,17 +16,15 @@
                 </div>
             </div>
         </div>
-        <n-upload></n-upload>
     </div>
 </template>
 <script>
     import Header from "@/components/Header.vue"
-    import Upload from "@/components/upload/upload.vue"
     import url from "@/api/url.js"
     import { mapActions } from "vuex"
     export default {
         name: "Login",
-        components: { "n-header": Header, 'n-upload': Upload },
+        components: { "n-header": Header },
         data() {
             return { username: '', password: '' };
         },
