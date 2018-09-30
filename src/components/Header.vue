@@ -7,7 +7,7 @@
             <span class="text">我的云笔记</span>
         </div>
         <div class="user-info" v-if="isLogin">
-            <img src="@/assets/nvdu.png" title="个人信息">
+            <div class="avatar" title="个人信息"><img :src="userInfo.avatar" v-if="userInfo"></div>
             <n-icon name="xiala" style="cursor:pointer;" @click="showSet=true"></n-icon>
             <ul class="set" v-show="showSet">
                 <li @click="onMask">个人信息</li>
@@ -15,14 +15,14 @@
                 <li @click="onLogout">注销登录</li>
             </ul>
         </div>
-        <div class="mask" v-show="showMask">
+        <div class="mask" v-show="showMask" v-if="userInfo">
             <div class="per-info">
                 <div class="title">个人信息
                     <n-icon name="x" style="cursor:pointer;" class="n-icon" title="关闭" @click="closeMask"></n-icon>
                 </div>
                 <div class="item">
                     <span class="item-key">头像</span>
-                    <img src="@/assets/nvdu.png" title="点击查看原图">
+                    <div class="avatar"><img src="@/assets/nvdu.png" title="点击查看原图" v-if="userInfo.avatar"></div>
                     <div id="upload" class="upload">
                         <el-button plain id="new-avatar" class="new-avatar">上传新头像</el-button>
                         <p>支持JPG、PNG格式，小于200KB</p>
@@ -34,26 +34,26 @@
                 </div>
                 <div class="item">
                     <span class="item-key">昵称</span>
-                    <el-input v-model.trim="nickname"></el-input>
+                    <el-input v-model.trim="userInfo.nickname"></el-input>
                 </div>
                 <div class="item">
                     <span class="item-key">性别</span>
-                    <el-radio v-model="sex" label="male">男</el-radio>
-                    <el-radio v-model="sex" label="female">女</el-radio>
-                    <el-radio v-model="sex" label="secret">保密</el-radio>
+                    <el-radio v-model="userInfo.sex" label="male">男</el-radio>
+                    <el-radio v-model="userInfo.sex" label="female">女</el-radio>
+                    <el-radio v-model="userInfo.sex" label="secret">保密</el-radio>
                 </div>
                 <div class="item">
                     <span class="item-key">签名</span>
-                    <el-input type="textarea" :rows="2" v-model.trim="sign" resize="none">
+                    <el-input type="textarea" :rows="2" v-model.trim="userInfo.sign" resize="none">
                     </el-input>
                 </div>
                 <div class="item">
-                    <el-button type="primary">保存</el-button>
+                    <el-button type="primary" @click="onUpdateUserInfo">保存</el-button>
                     <el-button plain>取消</el-button>
                 </div>
             </div>
         </div>
-        <n-upload container-id="upload" browse-id="new-avatar"></n-upload>
+        <n-upload container-id="upload" browse-id="new-avatar" @uploaded="uploaded($event)"></n-upload>
     </div>
 </template>
 <script>
@@ -67,10 +67,10 @@
         data() {
             return {
                 showSet: false,
-                nickname: '',
-                sex: 'secret',
-                sign: '',
-                showMask: false
+                showMask: false,
+                userInfo: null,
+                objectId: '',
+                loadedAvatar:''
             }
         },
         computed: {
@@ -80,9 +80,26 @@
             })
         },
         created() {
-            // Notebooks.saveAll({ name: 'jim', age: 20 }).then(res => {
-            //     console.log(res)
-            // }).catch(err => { console.log(err) })
+            if (this.user) {
+                Notebooks.queryUser({ userId: this.user.id }).then(res => {
+                    console.log(res); //array
+                    if (res.length === 0) {
+                        //创建用户
+                        Notebooks.createUser({
+                            userId: this.user.id,
+                            sex: 'secret',
+                            nickname: '',
+                            sign: '',
+                            avatar: ''
+                        }).then(res => {
+                            console.log(res)
+                        }).catch(err => { console.log(err) })
+                    } else {
+                        this.objectId = res[0].id;
+                        this.userInfo = { ...res[0].attributes };
+                    }
+                }).catch(err => { console.log(err) })
+            }
         },
         methods: {
             ...mapActions(['logout']),
@@ -97,6 +114,17 @@
             },
             closeMask() {
                 this.showMask = false;
+            },
+            onUpdateUserInfo() {
+                Notebooks.updateUser({
+                    ...this.userInfo
+                }, this.objectId).then(res => {
+                    console.log(res)
+                })
+            },
+            uploaded(url){
+                console.log(url);
+                this.loadedAvatar=url;
             }
         },
         watch: {
@@ -169,12 +197,17 @@
                 font-size: 22px;
                 margin-right: 250px;
                 position: relative;
-                >img {
+                .avatar {
                     width: 40px;
                     height: 40px;
                     border-radius: 4px;
                     cursor: pointer;
                     margin-right: 5px;
+                    >img {
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 4px;
+                    }
                 }
                 >.set {
                     position: absolute;
@@ -213,7 +246,7 @@
                 width: 100%;
                 height: 100%;
                 background: rgba(0, 0, 0, 0.3);
-                z-index: 1;
+                z-index: 2;
                 >.per-info {
                     position: fixed;
                     top: 50%;
@@ -258,11 +291,16 @@
                             width: 60px;
                         }
                         &:nth-child(2) {
-                            >img {
+                            .avatar {
                                 width: 50px;
                                 height: 50px;
                                 border-radius: 50%;
-                                cursor: pointer;
+                                >img {
+                                    width: 50px;
+                                    height: 50px;
+                                    border-radius: 50%;
+                                    cursor: pointer;
+                                }
                             }
                             >.upload {
                                 margin-left: 20px;
