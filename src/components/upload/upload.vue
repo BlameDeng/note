@@ -1,29 +1,57 @@
 <template>
     <div>
-        <button id="btn">123</button>
-        <button id="start" @click="onClick">321</button>
+        <form name=theform>
+            <input type="radio" name="myradio" value="local_name" checked=true /> 上传文件名字保持本地文件名字
+            <input type="radio" name="myradio" value="random_name" /> 上传文件名字是随机文件名
+            <br />
+            上传到指定目录:<input type="text" id='dirname' placeholder="如果不填，默认是上传到根目录" size=50>
+        </form>
+
+        <h4>您所选择的文件列表：</h4>
+        <div id="ossfile">你的浏览器不支持flash,Silverlight或者HTML5！</div>
+
+        <br />
+
+        <div id="container">
+            <a id="selectfiles" href="javascript:void(0);" class='btn'>选择文件</a>
+            <a id="postfiles" href="javascript:void(0);" class='btn'>开始上传</a>
+        </div>
+
+        <pre id="console"></pre>
+
+        <p>&nbsp;</p>
     </div>
 </template>
 <script>
-    import plupload from 'plupload'
-    // import uploader from './uploader.js'
+    import plupload from 'plupload';
     import Crypto from './crypto-min.js';
     import sha1 from './sha1-min.js';
     import hmac from './hmac-min.js';
     import Base64 from './base64.js';
     export default {
         name: 'Upload',
+        data() {
+            return {
+                uploader: null,
+                instance: null,
+                accessid: '',
+                policy: '',
+                signature: '',
+                host: ''
+            }
+        },
         mounted() {
-            console.log(Base64)
-            console.log(sha1)
-            console.log(Crypto)
+            // console.log(encodeURIComponent(encodeURIComponent(accessid)))
+
             let accessid = 'LTAIW5DpJ9UZaAvE';
             let accesskey = 'BujhhVwR2C8u1CyhHrxSXmlNOxlPtA';
             let host = 'https://notebooksavatar.oss-cn-shenzhen.aliyuncs.com';
+
             let g_dirname = ''
             let g_object_name = ''
             let g_object_name_type = ''
-            let now = Date.parse(new Date()) / 1000; //timestamp
+            let now = Date.parse(new Date()) / 1000;
+            let suffix = '';
 
             var policyText = {
                 "expiration": "2020-01-01T12:00:00.000Z", //设置该Policy的失效时间，超过这个失效时间之后，就没有办法通过这个policy上传文件了
@@ -36,6 +64,64 @@
             var message = policyBase64
             var bytes = Crypto.HMAC(Crypto.SHA1, message, accesskey, { asBytes: true });
             var signature = Crypto.util.bytesToBase64(bytes);
+
+            function check_object_radio() {
+                var tt = document.getElementsByName('myradio');
+                for (var i = 0; i < tt.length; i++) {
+                    if (tt[i].checked) {
+                        g_object_name_type = tt[i].value;
+                        break;
+                    }
+                }
+            }
+
+            function get_dirname() {
+                let dir = document.getElementById("dirname").value;
+                if (dir != '' && dir.indexOf('/') != dir.length - 1) {
+                    dir = dir + '/'
+                }
+                //alert(dir)
+                g_dirname = dir
+            }
+
+            function random_string(len) {
+                len = len || 32;
+                var chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
+                var maxPos = chars.length;
+                var pwd = '';
+                for (i = 0; i < len; i++) {
+                    pwd += chars.charAt(Math.floor(Math.random() * maxPos));
+                }
+                return pwd;
+            }
+
+            function get_suffix(filename) {
+                let pos = filename.lastIndexOf('.')
+                if (pos != -1) {
+                    suffix = filename.substring(pos)
+                }
+                return suffix;
+            }
+
+            function calculate_object_name(filename) {
+                if (g_object_name_type == 'local_name') {
+                    g_object_name += "${filename}"
+                } else if (g_object_name_type == 'random_name') {
+                    suffix = get_suffix(filename)
+                    g_object_name = g_dirname + random_string(10) + suffix
+                }
+                return ''
+            }
+
+            function get_uploaded_object_name(filename) {
+                if (g_object_name_type == 'local_name') {
+                    let tmp_name = g_object_name
+                    tmp_name = tmp_name.replace("${filename}", filename);
+                    return tmp_name
+                } else if (g_object_name_type == 'random_name') {
+                    return g_object_name
+                }
+            }
 
             function set_upload_param(up, filename, ret) {
                 g_object_name = g_dirname;
@@ -58,41 +144,65 @@
 
                 up.start();
             }
+
             var uploader = new plupload.Uploader({
-                browse_button: 'btn', //触发文件选择对话框的按钮，为那个元素id
-                url: 'https://notebooksavatar.oss-cn-shenzhen.aliyuncs.com', //服务器端的上传页面地址
-                silverlight_xap_url: 'js/Moxie.xap', //silverlight文件，当需要使用silverlight方式进行上传时需要配置该参数
-                init: function() {
-                    // set_upload_param(uploader, '', false);
-                },
-            });
+                runtimes: 'html5,flash,silverlight,html4',
+                browse_button: 'selectfiles',
+                multi_selection: false,
+                container: document.getElementById('container'),
+                flash_swf_url: 'lib/plupload-2.1.2/js/Moxie.swf',
+                silverlight_xap_url: 'lib/plupload-2.1.2/js/Moxie.xap',
+                url: host,
+                filters: { max_file_size: '100kb' },
 
-            //在实例对象上调用init()方法进行初始化
+                init: {
+                    PostInit: function() {
+                        document.getElementById('ossfile').innerHTML = '';
+                        document.getElementById('postfiles').onclick = function() {
+                            set_upload_param(uploader, '', false);
+                            return false;
+                        };
+                    },
+
+                    FilesAdded: function(up, files) {
+                        plupload.each(files, function(file) {
+                            document.getElementById('ossfile').innerHTML += '<div id="' + file.id + '">' + file.name + ' (' + plupload.formatSize(file.size) + ')<b></b>' +
+                                '<div class="progress"><div class="progress-bar" style="width: 0%"></div></div>' +
+                                '</div>';
+                        });
+                    },
+
+                    BeforeUpload: function(up, file) {
+                        check_object_radio();
+                        get_dirname();
+                        set_upload_param(up, file.name, true);
+                    },
+
+                    UploadProgress: function(up, file) {
+                        var d = document.getElementById(file.id);
+                        d.getElementsByTagName('b')[0].innerHTML = '<span>' + file.percent + "%</span>";
+                        var prog = d.getElementsByTagName('div')[0];
+                        var progBar = prog.getElementsByTagName('div')[0]
+                        progBar.style.width = 2 * file.percent + 'px';
+                        progBar.setAttribute('aria-valuenow', file.percent);
+                    },
+
+                    FileUploaded: function(up, file, info) {
+                        if (info.status == 200) {
+                            document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = 'upload to oss success, object name:' + get_uploaded_object_name(file.name);
+                            console.log('url' + '\n' + host + '/' + get_uploaded_object_name(file.name) + '?x-oss-process=style/avatar');
+                        } else {
+                            document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = info.response;
+                        }
+                    },
+
+                    Error: function(up, err) {
+                        document.getElementById('console').appendChild(document.createTextNode("\nError xml:" + err.response));
+                    }
+                }
+            });
             uploader.init();
-
-            //绑定各种事件，并在事件监听函数中做你想做的事
-            uploader.bind('FilesAdded', function(uploader, files) {
-                //每个事件监听函数都会传入一些很有用的参数，
-                //我们可以利用这些参数提供的信息来做比如更新UI，提示上传进度等操作
-            });
-            uploader.bind('UploadProgress', function(uploader, file) {
-                //每个事件监听函数都会传入一些很有用的参数，
-                //我们可以利用这些参数提供的信息来做比如更新UI，提示上传进度等操作
-            });
-            //......
-            //......
-
-            //最后给"开始上传"按钮注册事件
-            document.getElementById('start').onclick = function() {
-                uploader.start(); //调用实例对象的start()方法开始上传文件，当然你也可以在其他地方调用该方法
-            }
         },
-        methods: {
-            onClick() {
-                set_upload_param(uploader, '', false);
-                return false;
-            }
-        }
     }
 </script>
 <style lang="scss" scoped>
