@@ -144,7 +144,7 @@
                 flash_swf_url: 'lib/plupload-2.1.2/js/Moxie.swf',
                 silverlight_xap_url: 'lib/plupload-2.1.2/js/Moxie.xap',
                 url: host,
-                filters: { max_file_size: '100kb' },
+                filters: { max_file_size: '200kb' },
 
                 init: {
                     PostInit: function() {

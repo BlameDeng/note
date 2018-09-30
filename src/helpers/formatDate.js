@@ -6,7 +6,9 @@ export default {
             let year = obj.getFullYear();
             let month = obj.getMonth() + 1;
             let date = obj.getDate();
-            return `${year}-${month}-${date}`;
+            let hours=obj.getHours();
+            let minutes=obj.getMinutes();
+            return `${year}-${month}-${date} ${hours}:${minutes}`;
         }
     }
 }

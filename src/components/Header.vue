@@ -7,53 +7,72 @@
             <span class="text">我的云笔记</span>
         </div>
         <div class="user-info" v-if="isLogin">
-            <div class="avatar" title="个人信息"><img :src="userInfo.avatar" v-if="userInfo"></div>
+            <div class="avatar" title="个人信息" @click="onMask('person')"><img :src="userInfo.avatar" v-if="userInfo"></div>
             <n-icon name="xiala" style="cursor:pointer;" @click="showSet=true"></n-icon>
             <ul class="set" v-show="showSet">
-                <li @click="onMask">个人信息</li>
-                <li>账号信息</li>
+                <li @click="onMask('person')">个人信息</li>
+                <li @click="onMask('account')">账号信息</li>
                 <li @click="onLogout">注销登录</li>
             </ul>
         </div>
-        <div class="mask" v-show="showMask" v-if="userInfo">
-            <div class="per-info">
+        <transition name="fade">
+            <div class="mask" v-show="showMask">
+            </div>
+        </transition>
+        <transition name="fade">
+            <div class="per-info" v-if="userInfo&&maskType==='person'">
                 <div class="title">个人信息
                     <n-icon name="x" style="cursor:pointer;" class="n-icon" title="关闭" @click="closeMask"></n-icon>
                 </div>
                 <div class="item">
-                    <span class="item-key">头像</span>
-                    <div class="avatar"><img src="@/assets/nvdu.png" title="点击查看原图" v-if="userInfo.avatar"></div>
+                    <span class="item-key">头 像</span>
+                    <div class="avatar"><img :src="userInfo.avatar" title="点击查看原图" v-if="userInfo.avatar" @click="openOrigin"></div>
                     <div id="upload" class="upload">
                         <el-button plain id="new-avatar" class="new-avatar">上传新头像</el-button>
                         <p>支持JPG、PNG格式，小于200KB</p>
                     </div>
                 </div>
                 <div class="item">
-                    <span class="item-key">账号</span>
-                    <p v-if="user">{{user.name}}</p>
+                    <span class="item-key">账 号</span>
+                    <p v-if="user">{{user.username}}</p>
                 </div>
                 <div class="item">
-                    <span class="item-key">昵称</span>
+                    <span class="item-key">昵 称</span>
                     <el-input v-model.trim="userInfo.nickname"></el-input>
                 </div>
                 <div class="item">
-                    <span class="item-key">性别</span>
+                    <span class="item-key">性 别</span>
                     <el-radio v-model="userInfo.sex" label="male">男</el-radio>
                     <el-radio v-model="userInfo.sex" label="female">女</el-radio>
                     <el-radio v-model="userInfo.sex" label="secret">保密</el-radio>
                 </div>
                 <div class="item">
-                    <span class="item-key">签名</span>
+                    <span class="item-key">签 名</span>
                     <el-input type="textarea" :rows="2" v-model.trim="userInfo.sign" resize="none">
                     </el-input>
                 </div>
                 <div class="item">
                     <el-button type="primary" @click="onUpdateUserInfo">保存</el-button>
-                    <el-button plain>取消</el-button>
+                    <el-button plain @click="closeMask">取消</el-button>
                 </div>
             </div>
-        </div>
-        <n-upload container-id="upload" browse-id="new-avatar" @uploaded="uploaded($event)"></n-upload>
+        </transition>
+        <transition name="fade">
+            <div class="account-info" v-show="maskType==='account'">
+                <div class="title">个人信息
+                    <n-icon name="x" style="cursor:pointer;" class="n-icon" title="关闭" @click="closeMask"></n-icon>
+                </div>
+                <div class="item">
+                    <span class="item-key">账号</span>
+                    <p v-if="user">{{user.username}}</p>
+                </div>
+                <div class="item">
+                    <span class="item-key">注册日期</span>
+                    <p v-if="user">{{formatDate(user.createdAt)}}</p>
+                </div>
+            </div>
+        </transition>
+        <n-upload container-id="upload" browse-id="new-avatar" @uploaded="uploaded($event)" v-if="userInfo"></n-upload>
     </div>
 </template>
 <script>
@@ -70,7 +89,7 @@
                 showMask: false,
                 userInfo: null,
                 objectId: '',
-                loadedAvatar:''
+                maskType: ''
             }
         },
         computed: {
@@ -90,7 +109,7 @@
                             sex: 'secret',
                             nickname: '',
                             sign: '',
-                            avatar: ''
+                            avatar: 'https://notebooksavatar.oss-cn-shenzhen.aliyuncs.com/default.png?x-oss-process=style/avatar'
                         }).then(res => {
                             console.log(res)
                         }).catch(err => { console.log(err) })
@@ -109,11 +128,13 @@
             listenDocument() {
                 this.showSet = false;
             },
-            onMask() {
+            onMask(type) {
                 this.showMask = true;
+                this.maskType = type;
             },
             closeMask() {
                 this.showMask = false;
+                this.maskType = '';
             },
             onUpdateUserInfo() {
                 Notebooks.updateUser({
@@ -122,9 +143,11 @@
                     console.log(res)
                 })
             },
-            uploaded(url){
-                console.log(url);
-                this.loadedAvatar=url;
+            uploaded(url) {
+                this.userInfo.avatar = url
+            },
+            openOrigin() {
+                window.open(this.userInfo.avatar.replace('?x-oss-process=style/avatar', ''), "_blank");
             }
         },
         watch: {
@@ -218,14 +241,14 @@
                     font-size: 14px;
                     background: #fff;
                     color: $tcolor3;
-                    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+                    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.4);
                     cursor: pointer;
                     user-select: none;
                     border-bottom-left-radius: 4px;
                     border-bottom-right-radius: 4px;
                     >li {
                         width: 100%;
-                        height: 30px;
+                        height: 40px;
                         text-align: center;
                         display: flex;
                         justify-content: center;
@@ -247,81 +270,141 @@
                 height: 100%;
                 background: rgba(0, 0, 0, 0.3);
                 z-index: 2;
-                >.per-info {
-                    position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    width: 400px;
-                    transform: translateX(-50%) translateY(-50%);
-                    background: #fff;
-                    color: $tcolor3;
-                    font-size: 14px;
-                    border-radius: 4px;
-                    padding: 30px 20px;
-                    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-                    outline: inset 2px solid #666;
-                    >.title {
-                        color: $tcolor2;
-                        text-align: center;
-                        padding: 5px 0;
-                        font-size: 16px;
-                        margin-bottom: 10px;
-                        position: relative;
-                        user-select: none;
-                        >.n-icon {
-                            position: absolute;
-                            top: 50%;
-                            right: 0;
-                            transform: translateY(-50%);
-                            font-size: 12px;
-                            color: $tcolor4;
-                            &:hover {
-                                color: $tcolor3;
-                            }
-                        }
-                    }
-                    >.item {
-                        display: flex;
-                        justify-content: flex-start;
-                        align-items: center;
-                        padding: 10px 0;
-                        >.item-key {
-                            display: inline-block;
-                            flex-shrink: 0;
-                            width: 60px;
-                        }
-                        &:nth-child(2) {
-                            .avatar {
-                                width: 50px;
-                                height: 50px;
-                                border-radius: 50%;
-                                >img {
-                                    width: 50px;
-                                    height: 50px;
-                                    border-radius: 50%;
-                                    cursor: pointer;
-                                }
-                            }
-                            >.upload {
-                                margin-left: 20px;
-                                >.new-avatar {
-                                    padding: 6px 8px;
-                                    font-size: 12px;
-                                    margin-bottom: 6px;
-                                }
-                                >p {
-                                    font-size: 12px;
-                                    color: $tcolor4;
-                                }
-                            }
-                        }
-                        &:last-child {
-                            justify-content: center;
-                            margin-top: 15px;
+            }
+            >.per-info {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                width: 400px;
+                transform: translateX(-50%) translateY(-50%);
+                background: #fff;
+                color: $tcolor3;
+                font-size: 14px;
+                border-radius: 4px;
+                padding: 30px 20px;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+                outline: inset 2px solid #666;
+                z-index: 3;
+                >.title {
+                    color: $tcolor2;
+                    text-align: center;
+                    padding: 5px 0;
+                    font-size: 16px;
+                    margin-bottom: 10px;
+                    position: relative;
+                    user-select: none;
+                    >.n-icon {
+                        position: absolute;
+                        top: 50%;
+                        right: 0;
+                        transform: translateY(-50%);
+                        font-size: 12px;
+                        color: $tcolor4;
+                        &:hover {
+                            color: $tcolor3;
                         }
                     }
                 }
+                >.item {
+                    display: flex;
+                    justify-content: flex-start;
+                    align-items: center;
+                    padding: 10px 0;
+                    >.item-key {
+                        display: inline-block;
+                        padding-left: 10px;
+                        flex-shrink: 0;
+                        width: 60px;
+                    }
+                    &:nth-child(2) {
+                        .avatar {
+                            width: 50px;
+                            height: 50px;
+                            border-radius: 50%;
+                            >img {
+                                width: 50px;
+                                height: 50px;
+                                border-radius: 50%;
+                                cursor: pointer;
+                            }
+                        }
+                        >.upload {
+                            margin-left: 20px;
+                            >.new-avatar {
+                                padding: 6px 8px;
+                                font-size: 12px;
+                                margin-bottom: 6px;
+                            }
+                            >p {
+                                font-size: 12px;
+                                color: $tcolor4;
+                            }
+                        }
+                    }
+                    &:last-child {
+                        justify-content: center;
+                        margin-top: 15px;
+                    }
+                }
             }
+            >.account-info {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                width: 400px;
+                transform: translateX(-50%) translateY(-50%);
+                background: #fff;
+                color: $tcolor3;
+                font-size: 14px;
+                border-radius: 4px;
+                padding: 30px 20px;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+                outline: inset 2px solid #666;
+                z-index: 3;
+                >.title {
+                    color: $tcolor2;
+                    text-align: center;
+                    padding: 5px 0;
+                    font-size: 16px;
+                    margin-bottom: 10px;
+                    position: relative;
+                    user-select: none;
+                    >.n-icon {
+                        position: absolute;
+                        top: 50%;
+                        right: 0;
+                        transform: translateY(-50%);
+                        font-size: 12px;
+                        color: $tcolor4;
+                        &:hover {
+                            color: $tcolor3;
+                        }
+                    }
+                }
+                >.item {
+                    display: flex;
+                    justify-content: flex-start;
+                    align-items: center;
+                    padding: 10px 0;
+                    >.item-key {
+                        display: inline-block;
+                        flex-shrink: 0;
+                        width: 70px;
+                        text-align: end;
+                        margin-right: 20px;
+                        font-weight: bold;
+                        padding-left: 10px;
+                    }
+                }
+            }
+
+        }
+        //过渡
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity .3s;
+        }
+        .fade-enter, .fade-leave-to {
+            opacity: 0;
         }
     }
 </style>
