@@ -60,6 +60,7 @@
     import Icon from './icon.vue'
     import Upload from "@/components/upload/upload.vue"
     import { mapState, mapActions } from 'vuex'
+    import AV from 'leancloud-storage'
     export default {
         name: 'Header',
         components: { 'n-icon': Icon, 'n-upload': Upload },
@@ -77,6 +78,9 @@
                 isLogin: state => state.auth.isLogin,
                 user: state => state.auth.user
             })
+        },
+        created() {
+             console.log(AV)
         },
         methods: {
             ...mapActions(['logout']),
