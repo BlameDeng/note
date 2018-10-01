@@ -1,6 +1,6 @@
 import Icon from "../icon.vue";
 import Scrollbar from "../scrollbar.vue";
-import { mapState,mapGetters, mapActions, mapMutations } from "vuex";
+import { mapState, mapActions, mapMutations } from "vuex";
 export default {
     name: "Nav",
     components: { "n-icon": Icon, "n-scrollbar": Scrollbar },
@@ -47,7 +47,11 @@ export default {
             'getTrashNotes',
             'getNotes'
         ]),
-        ...mapMutations(['setCurrentTab', 'setCurrentBook']),
+        ...mapMutations([
+            'setCurrentTab',
+            'setCurrentBook',
+            'setNotes'
+        ]),
         onAddNote() {
             if (!this.allBooks.length) {
                 this.$message({
@@ -78,6 +82,7 @@ export default {
             this.setCurrentTab('books');
             this.retract = false;
             this.$refs.bookScrollbar.scrollToEnd();
+            this.setNotes({ notes: null });
         },
         onClickTab(e, tab) {
             this.setCurrentTab(tab);

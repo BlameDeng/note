@@ -160,7 +160,7 @@
                     FilesAdded: function(up, files) {
                         if (!that.postId) {
                             set_upload_param(uploader, '', false);
-                        }  //自动上传
+                        } //自动上传
                         // plupload.each(files, function(file) {
                         //     document.getElementById('ossfile').innerHTML += '<div id="' + file.id + '">' + file.name + ' (' + plupload.formatSize(file.size) + ')<b></b>' +
                         //         '<div class="progress"><div class="progress-bar" style="width: 0%"></div></div>' +
@@ -202,11 +202,9 @@
 </script>
 <style lang="scss" scoped>
     #my-plupload {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 0;
-        height: 0;
-        overflow: hidden;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        display: none;
     }
 </style>

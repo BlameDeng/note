@@ -232,11 +232,4 @@
             }
         }
     }
-    //过渡
-    .retract-enter-active, .retract-leave-active {
-        transition: all .5s;
-    }
-    .retract-enter, .retract-leave-to {
-        margin-top: -300px;
-    }
 }
