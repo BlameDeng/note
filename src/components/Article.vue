@@ -2,7 +2,7 @@
     <div class="article">
         <div class="title-bar">
             <div class="inner-wrapper" v-if="title">
-                <input type="text" v-model.trim="title" ref="input" v-if="currentNote">
+                <input type="text" v-model.trim="title" ref="input" v-if="currentNote" maxlength="60">
                 <div class="btn-wrapper">
                     <el-button plain class="el-btn" @click="onSaveNote">保存</el-button>
                     <el-button plain class="el-btn" @click="onPreview" :class="{[`preview-btn`]:preview}">Markdown 预览</el-button>
@@ -145,9 +145,11 @@
                 justify-content: space-between;
                 align-items: center;
                 >input {
+                    min-width: 300px;
                     border: none;
                     font-size: 18px;
                     padding-left: 20px;
+                    flex-grow: 1;
                     &:focus {
                         outline: none;
                     }
@@ -159,6 +161,7 @@
                     align-items: center;
                     >.el-btn {
                         padding: 8px 10px;
+                        font-size: 12px;
                         &.preview-btn {
                             background: $tcolor;
                             color: #fff;

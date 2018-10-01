@@ -38,7 +38,7 @@
                 </div>
                 <div class="item">
                     <span class="item-key">昵 称</span>
-                    <el-input v-model.trim="userInfo.nickname"></el-input>
+                    <el-input v-model.trim="userInfo.nickname" maxlength="10"></el-input>
                 </div>
                 <div class="item">
                     <span class="item-key">性 别</span>
@@ -48,8 +48,9 @@
                 </div>
                 <div class="item">
                     <span class="item-key">签 名</span>
-                    <el-input type="textarea" :rows="2" v-model.trim="userInfo.sign" resize="none">
+                    <el-input type="textarea" :rows="3" v-model.trim="userInfo.sign" resize="none" maxlength="60">
                     </el-input>
+                    <span class="sign-limit">{{userInfo.sign.length}} / 60</span>
                 </div>
                 <div class="item">
                     <el-button type="primary" @click="onUpdateUserInfo">保存</el-button>
@@ -101,23 +102,19 @@
         created() {
             if (this.user) {
                 Notebooks.queryUser({ userId: this.user.id }).then(res => {
-                    console.log(res); //array
                     if (res.length === 0) {
-                        //创建用户
                         Notebooks.createUser({
                             userId: this.user.id,
                             sex: 'secret',
                             nickname: '',
                             sign: '',
                             avatar: 'https://notebooksavatar.oss-cn-shenzhen.aliyuncs.com/default.png?x-oss-process=style/avatar'
-                        }).then(res => {
-                            console.log(res)
-                        }).catch(err => { console.log(err) })
+                        }).then(res => {}).catch(err => {})
                     } else {
                         this.objectId = res[0].id;
                         this.userInfo = { ...res[0].attributes };
                     }
-                }).catch(err => { console.log(err) })
+                }).catch(err => {})
             }
         },
         methods: {
@@ -140,7 +137,8 @@
                 Notebooks.updateUser({
                     ...this.userInfo
                 }, this.objectId).then(res => {
-                    console.log(res)
+                    this.showMask = false;
+                    this.maskType = '';
                 })
             },
             uploaded(url) {
@@ -310,11 +308,19 @@
                     justify-content: flex-start;
                     align-items: center;
                     padding: 10px 0;
+                    position: relative;
                     >.item-key {
                         display: inline-block;
                         padding-left: 10px;
                         flex-shrink: 0;
                         width: 60px;
+                    }
+                    >.sign-limit {
+                        position: absolute;
+                        bottom: 16px;
+                        right: 4px;
+                        font-size: 12px;
+                        color: $tcolor4;
                     }
                     &:nth-child(2) {
                         .avatar {
@@ -399,7 +405,6 @@
             }
 
         }
-        //过渡
         .fade-enter-active, .fade-leave-active {
             transition: opacity .3s;
         }

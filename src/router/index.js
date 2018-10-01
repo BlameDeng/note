@@ -1,11 +1,12 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+Vue.use(Router);
+
 import Login from '@/pages/login/login.vue'
 import Register from '@/pages/register/register.vue'
 import File from '@/pages/file/file.vue'
 
 import store from '@/store'
-Vue.use(Router)
 
 const router = new Router({
     routes: [{
