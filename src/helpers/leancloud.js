@@ -55,7 +55,4 @@ Notebooks.updateUser = function(obj, objectId) {
     return leancloud.save();
 }
 
-
-
-
 export default Notebooks
